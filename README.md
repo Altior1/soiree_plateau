@@ -10,6 +10,17 @@ Les fonctionnalites principales de ce projet sont:
 - [ ] differenciation admin/ user
 
 
+## Choix techniques
+Pourquoi avoir choisi Elixir/ Phoenix pour ce projet :
+- une technologie qui gere les concurrences de facon native ( donc deux personnes qui consulte la meme soiree, un admin qui modifie un jeu en meme temps qu'un autre)
+- connaissance de la technologie en amont
+
+
+
+
+
+# les explication du README genere par phoenix
+
 To start your Phoenix server:
 
 * Run `mix setup` to install and setup dependencies
