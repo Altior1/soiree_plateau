@@ -41,6 +41,11 @@ defmodule SoireePlateau.AccountsFixtures do
     user
   end
 
+  def admin_user_fixture(attrs \\ %{}) do
+    attrs = Map.put(attrs, :is_admin, true)
+    user_fixture(attrs)
+  end
+
   def user_scope_fixture do
     user = user_fixture()
     user_scope_fixture(user)

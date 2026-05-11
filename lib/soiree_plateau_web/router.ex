@@ -72,4 +72,16 @@ defmodule SoireePlateauWeb.Router do
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end
+
+  scope "/admin", SoireePlateauWeb do
+    pipe_through [:browser]
+
+    live_session :current_user_admin,
+      on_mount: [{SoireePlateauWeb.UserAuth, :require_authenticated_admin}] do
+      live "/games", GameLive.Index, :index
+      live "/games/new", GameLive.Form, :new
+      live "/games/:id", GameLive.Show, :show
+      live "/games/:id/edit", GameLive.Form, :edit
+    end
+  end
 end

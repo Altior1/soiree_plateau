@@ -13,17 +13,12 @@ defmodule SoireePlateau.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  def admin_changeset(user, attrs) do
-    user
-    |> cast(attrs, [:is_admin])
-    |> validate_required([:is_admin])
-  end
-
   @doc """
   A user changeset for registering or changing the email.
 
   It requires the email to change otherwise an error is added.
 
+  on ajoute la propri
   ## Options
 
     * `:validate_unique` - Set to false if you don't want to validate the
@@ -32,8 +27,15 @@ defmodule SoireePlateau.Accounts.User do
   """
   def email_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email])
+    |> cast(attrs, [:email, :is_admin])
     |> validate_email(opts)
+  end
+
+  def email_and_password_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_email(opts)
+    |> validate_password(opts)
   end
 
   defp validate_email(changeset, opts) do

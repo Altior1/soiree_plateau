@@ -7,13 +7,13 @@ name: Elixir CI
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   build:
 
     name: Build and test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu22
 
     steps:
     - uses: actions/checkout@v4
