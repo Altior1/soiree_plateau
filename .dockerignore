@@ -1,0 +1,33 @@
+_build
+deps
+.git
+.gitignore
+.elixir_ls
+.vscode
+.idea
+
+# Mix artifacts
+*.ez
+erl_crash.dump
+
+# Generated assets (recompiled in build stage)
+priv/static/assets
+priv/static/cache_manifest.json
+assets/node_modules
+
+# Test & dev
+test
+cover
+.env
+.env.*
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Docs
+README.md
+AGENTS.md
+Backlog.md
+"schema de conception"
