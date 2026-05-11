@@ -17,4 +17,6 @@ Pourquoi j'ai dockerisé au lieu d'utilisé Release ?
 -> facilité de déploiement sur un plus large pannel de solution
 -> + permet d'éviter pour un ordinateur sans ASDF l'installation d'une version précise d'Elixir
 
+On ne scope pas les jeux ( on ne crée pas de dépendance forte entre les jeux et l'utilisateur ) car on ne souhaite pas qu'un administrateur ait une quelconque propriété sur le jeu. Par conséquent, la mention du no-scope est extrèmement importante.
 
+à l'inverse, pour les invitations, on laissera sur le scope user, pour apporter ce confort d'avoir déjà un lien entre user et soirée, qui illustrera la relation "accueille" entre user et soirée
