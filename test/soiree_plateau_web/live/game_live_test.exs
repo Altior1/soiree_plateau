@@ -14,7 +14,7 @@ defmodule SoireePlateauWeb.GameLiveTest do
   end
 
   describe "Index" do
-    setup [:create_game]
+    setup [:create_game, :register_and_log_in_user_admin]
 
     test "lists all games", %{conn: conn, game: game} do
       {:ok, _index_live, html} = live(conn, ~p"/admin/games")
@@ -84,7 +84,7 @@ defmodule SoireePlateauWeb.GameLiveTest do
   end
 
   describe "Show" do
-    setup [:create_game]
+    setup [:create_game, :register_and_log_in_user_admin]
 
     test "displays game", %{conn: conn, game: game} do
       {:ok, _show_live, html} = live(conn, ~p"/admin/games/#{game}")

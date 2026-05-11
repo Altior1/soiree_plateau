@@ -56,6 +56,18 @@ defmodule SoireePlateauWeb.ConnCase do
     %{conn: log_in_user(conn, user, opts), user: user, scope: scope}
   end
 
+  def register_and_log_in_user_admin(%{conn: conn} = context) do
+    user = SoireePlateau.AccountsFixtures.admin_user_fixture()
+    scope = SoireePlateau.Accounts.Scope.for_user(user)
+
+    opts =
+      context
+      |> Map.take([:token_authenticated_at])
+      |> Enum.into([])
+
+    %{conn: log_in_user(conn, user, opts), user: user, scope: scope}
+  end
+
   @doc """
   Logs the given `user` into the `conn`.
 

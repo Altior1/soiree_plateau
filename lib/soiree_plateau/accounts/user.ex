@@ -13,12 +13,6 @@ defmodule SoireePlateau.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  def admin_changeset(user, attrs) do
-    user
-    |> cast(attrs, [:is_admin])
-    |> validate_required([:is_admin])
-  end
-
   @doc """
   A user changeset for registering or changing the email.
 
@@ -32,7 +26,7 @@ defmodule SoireePlateau.Accounts.User do
   """
   def email_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email])
+    |> cast(attrs, [:email, :is_admin])
     |> validate_email(opts)
   end
 

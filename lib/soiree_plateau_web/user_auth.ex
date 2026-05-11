@@ -230,6 +230,22 @@ defmodule SoireePlateauWeb.UserAuth do
     end
   end
 
+  def on_mount(:require_authenticated_admin, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope && socket.assigns.current_scope.user &&
+         socket.assigns.current_scope.user.is_admin do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "You must log in as an admin to access this page.")
+        |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
+
+      {:halt, socket}
+    end
+  end
+
   def on_mount(:require_sudo_mode, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
