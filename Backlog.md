@@ -24,4 +24,7 @@ Fichier pour noter les idees d'avamcement
 - [ ] US07 :
   en tant que membre, je veux pouvoir indiquer ma participation a une soiree afin de pouvoir y participer
 
-## Optionnet
+## Optionnel
+
+- [ ] USR08 :
+  en tant que hôte, j'aimerais voir les jeux que mes invités ont préféré quand je crée la soirée afin de leur faire une proposition alléchante
