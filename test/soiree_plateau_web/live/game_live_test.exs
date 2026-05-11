@@ -17,20 +17,20 @@ defmodule SoireePlateauWeb.GameLiveTest do
     setup [:create_game]
 
     test "lists all games", %{conn: conn, game: game} do
-      {:ok, _index_live, html} = live(conn, ~p"/games")
+      {:ok, _index_live, html} = live(conn, ~p"/admin/games")
 
       assert html =~ "Listing Games"
       assert html =~ game.name
     end
 
     test "saves new game", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/games")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/games")
 
       assert {:ok, form_live, _} =
                index_live
                |> element("a", "New Game")
                |> render_click()
-               |> follow_redirect(conn, ~p"/games/new")
+               |> follow_redirect(conn, ~p"/admin/games/new")
 
       assert render(form_live) =~ "New Game"
 
@@ -42,7 +42,7 @@ defmodule SoireePlateauWeb.GameLiveTest do
                form_live
                |> form("#game-form", game: @create_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/games")
+               |> follow_redirect(conn, ~p"/admin/games")
 
       html = render(index_live)
       assert html =~ "Game created successfully"
@@ -50,13 +50,13 @@ defmodule SoireePlateauWeb.GameLiveTest do
     end
 
     test "updates game in listing", %{conn: conn, game: game} do
-      {:ok, index_live, _html} = live(conn, ~p"/games")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/games")
 
       assert {:ok, form_live, _html} =
                index_live
                |> element("#games-#{game.id} a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/games/#{game}/edit")
+               |> follow_redirect(conn, ~p"/admin/games/#{game}/edit")
 
       assert render(form_live) =~ "Edit Game"
 
@@ -68,7 +68,7 @@ defmodule SoireePlateauWeb.GameLiveTest do
                form_live
                |> form("#game-form", game: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/games")
+               |> follow_redirect(conn, ~p"/admin/games")
 
       html = render(index_live)
       assert html =~ "Game updated successfully"
@@ -76,7 +76,7 @@ defmodule SoireePlateauWeb.GameLiveTest do
     end
 
     test "deletes game in listing", %{conn: conn, game: game} do
-      {:ok, index_live, _html} = live(conn, ~p"/games")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/games")
 
       assert index_live |> element("#games-#{game.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#games-#{game.id}")
@@ -87,20 +87,20 @@ defmodule SoireePlateauWeb.GameLiveTest do
     setup [:create_game]
 
     test "displays game", %{conn: conn, game: game} do
-      {:ok, _show_live, html} = live(conn, ~p"/games/#{game}")
+      {:ok, _show_live, html} = live(conn, ~p"/admin/games/#{game}")
 
       assert html =~ "Show Game"
       assert html =~ game.name
     end
 
     test "updates game and returns to show", %{conn: conn, game: game} do
-      {:ok, show_live, _html} = live(conn, ~p"/games/#{game}")
+      {:ok, show_live, _html} = live(conn, ~p"/admin/games/#{game}")
 
       assert {:ok, form_live, _} =
                show_live
                |> element("a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/games/#{game}/edit?return_to=show")
+               |> follow_redirect(conn, ~p"/admin/games/#{game}/edit?return_to=show")
 
       assert render(form_live) =~ "Edit Game"
 
@@ -112,7 +112,7 @@ defmodule SoireePlateauWeb.GameLiveTest do
                form_live
                |> form("#game-form", game: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/games/#{game}")
+               |> follow_redirect(conn, ~p"/admin/games/#{game}")
 
       html = render(show_live)
       assert html =~ "Game updated successfully"

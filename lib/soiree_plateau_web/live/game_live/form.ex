@@ -90,6 +90,6 @@ defmodule SoireePlateauWeb.GameLive.Form do
     end
   end
 
-  defp return_path("index", _game), do: ~p"/games"
-  defp return_path("show", game), do: ~p"/games/#{game}"
+  defp return_path("index", _game), do: ~p"/admin/games"
+  defp return_path("show", game), do: ~p"/admin/games/#{game}"
 end

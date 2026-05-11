@@ -10,7 +10,7 @@ defmodule SoireePlateauWeb.GameLive.Index do
       <.header>
         Listing Games
         <:actions>
-          <.button variant="primary" navigate={~p"/games/new"}>
+          <.button variant="primary" navigate={~p"/admin/games/new"}>
             <.icon name="hero-plus" /> New Game
           </.button>
         </:actions>
@@ -19,15 +19,15 @@ defmodule SoireePlateauWeb.GameLive.Index do
       <.table
         id="games"
         rows={@streams.games}
-        row_click={fn {_id, game} -> JS.navigate(~p"/games/#{game}") end}
+        row_click={fn {_id, game} -> JS.navigate(~p"/admin/games/#{game}") end}
       >
         <:col :let={{_id, game}} label="Name">{game.name}</:col>
         <:col :let={{_id, game}} label="Description">{game.description}</:col>
         <:action :let={{_id, game}}>
           <div class="sr-only">
-            <.link navigate={~p"/games/#{game}"}>Show</.link>
+            <.link navigate={~p"/admin/games/#{game}"}>Show</.link>
           </div>
-          <.link navigate={~p"/games/#{game}/edit"}>Edit</.link>
+          <.link navigate={~p"/admin/games/#{game}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, game}}>
           <.link

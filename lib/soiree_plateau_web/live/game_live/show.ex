@@ -11,10 +11,10 @@ defmodule SoireePlateauWeb.GameLive.Show do
         Game {@game.id}
         <:subtitle>This is a game record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/games"}>
+          <.button navigate={~p"/admin/games"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/games/#{@game}/edit?return_to=show"}>
+          <.button variant="primary" navigate={~p"/admin/games/#{@game}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> Edit game
           </.button>
         </:actions>
