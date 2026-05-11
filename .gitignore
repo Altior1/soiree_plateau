@@ -35,3 +35,4 @@ soiree_plateau-*.tar
 npm-debug.log
 /assets/node_modules/
 
+.env
