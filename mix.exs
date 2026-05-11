@@ -4,8 +4,8 @@ defmodule SoireePlateau.MixProject do
   def project do
     [
       app: :soiree_plateau,
-      version: "0.1.0",
-      elixir: "~> 1.15",
+      version: "0.1.1",
+      elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -65,7 +65,9 @@ defmodule SoireePlateau.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      # dépendance nécessaire pour hasher les mots de passe
+      {:pbkdf2_elixir, "~> 2.0"}
     ]
   end
 
