@@ -35,4 +35,8 @@ soiree_plateau-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# pour raison évidente, on ignore les fichiers de configuration d'environnement qui peuvent contenir des secrets
 .env
+
+# on ignore aussi les fichiers de données de la base de données pour éviter de commiter des données sensibles
+db_data/
