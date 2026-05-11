@@ -18,6 +18,7 @@ defmodule SoireePlateau.Accounts.User do
 
   It requires the email to change otherwise an error is added.
 
+  on ajoute la propri
   ## Options
 
     * `:validate_unique` - Set to false if you don't want to validate the
@@ -28,6 +29,13 @@ defmodule SoireePlateau.Accounts.User do
     user
     |> cast(attrs, [:email, :is_admin])
     |> validate_email(opts)
+  end
+
+  def email_and_password_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_email(opts)
+    |> validate_password(opts)
   end
 
   defp validate_email(changeset, opts) do

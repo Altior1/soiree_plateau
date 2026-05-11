@@ -80,6 +80,12 @@ defmodule SoireePlateau.Accounts do
     |> Repo.insert()
   end
 
+  def register_user_with_password(attrs) do
+    %User{}
+    |> User.email_and_password_changeset(attrs)
+    |> Repo.insert()
+  end
+
   ## Settings
 
   @doc """
@@ -109,6 +115,10 @@ defmodule SoireePlateau.Accounts do
   """
   def change_user_email(user, attrs \\ %{}, opts \\ []) do
     User.email_changeset(user, attrs, opts)
+  end
+
+  def change_user_password_email(user, attrs \\ %{}, opts \\ []) do
+    User.email_and_password_changeset(user, attrs, opts)
   end
 
   @doc """
