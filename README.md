@@ -10,6 +10,13 @@ Les fonctionnalites principales de ce projet sont:
 - [ ] differenciation admin/ user
 
 
+## Comment faire fonctionner le projet
+-> pour l'environnement de production ( qui sert de démonstration) pour éviter d'avoir à installer Phoenix, il "suffit" de lancer le docker-compose.yml
+
+-> pour lancer uniquement une db et faire tourner le projet et avoir accès au logs, on peut utiliser le docker-compose-dev.yml
+
+Pour faire les choses proprement, une branche doit être créer avec en nom la user-Story qui va être implémenter. Les choix techniques pure ( si modification de la CI, des dockers..), on peut les merge directement afin de gagner du temps.
+
 ## Choix techniques
 Pourquoi avoir choisi Elixir/ Phoenix pour ce projet :
 - une technologie qui gere les concurrences de facon native ( donc deux personnes qui consulte la meme soiree, un admin qui modifie un jeu en meme temps qu'un autre)
