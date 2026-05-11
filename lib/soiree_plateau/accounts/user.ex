@@ -8,8 +8,15 @@ defmodule SoireePlateau.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+    field :is_admin, :boolean, default: false
 
     timestamps(type: :utc_datetime)
+  end
+
+  def admin_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:is_admin])
+    |> validate_required([:is_admin])
   end
 
   @doc """
