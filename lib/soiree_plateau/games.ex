@@ -22,6 +22,19 @@ defmodule SoireePlateau.Games do
   end
 
   @doc """
+  cette fonction est utilisée pour récupérer la liste des jeux dans un format adapté pour les formulaires
+  (une liste de tuples {name, id} triée par nom)
+
+  ## Examples
+
+      iex> list_games_for_form()
+      [{"Catan", 1}, {"Carcassonne", 2}, ...]
+  """
+  def list_games_for_form do
+    Repo.all(from g in Game, order_by: g.name, select: {g.name, g.id})
+  end
+
+  @doc """
   Gets a single game.
 
   Raises `Ecto.NoResultsError` if the Game does not exist.

@@ -16,8 +16,9 @@ defmodule SoireePlateau.Teuf.Soiree do
   @doc false
   def changeset(soiree, attrs, user_scope) do
     soiree
-    |> cast(attrs, [:title, :date, :home, :capacity])
+    |> cast(attrs, [:title, :date, :home, :capacity, :game_id])
     |> validate_required([:title, :date, :home, :capacity])
     |> put_change(:host, user_scope.user.id)
+    |> put_change(:game_id, attrs["game_id"])
   end
 end

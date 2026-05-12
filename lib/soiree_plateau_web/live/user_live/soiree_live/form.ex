@@ -18,6 +18,7 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
         <.input field={@form[:date]} type="datetime-local" label="Date" />
         <.input field={@form[:home]} type="text" label="Home" />
         <.input field={@form[:capacity]} type="number" label="Capacity" />
+        <.input field={@form[:game_id]} type="select" label="Game" options={SoireePlateau.Games.list_games_for_form()} />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Soiree</.button>
           <.button navigate={return_path(@current_scope, @return_to, @soiree)}>Cancel</.button>
@@ -65,6 +66,8 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
   end
 
   def handle_event("save", %{"soiree" => soiree_params}, socket) do
+    # on force ici le cast en int de game_id, pour ne pas le catch après ( le changeset sert à la validation aussi )
+    soiree_params = Map.update(soiree_params, "game_id", nil, fn game_id -> if game_id == "", do: nil, else: String.to_integer(game_id) end)
     save_soiree(socket, socket.assigns.live_action, soiree_params)
   end
 
