@@ -1,4 +1,4 @@
-=> MVP ( journée du mardi)
+s=> MVP ( journée du mardi)
 
 - [X] : la partie connection des utilisateurs
 - [X] : les admnins peuvent gérer les jeux
