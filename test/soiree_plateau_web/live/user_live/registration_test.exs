@@ -40,7 +40,7 @@ defmodule SoireePlateauWeb.UserLive.RegistrationTest do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
       email = unique_user_email()
-      form = form(lv, "#registration_form", user: valid_user_attributes(email: email))
+      form = form(lv, "#registration_form", user: valid_user_attributes(email: email, password: valid_user_password(), password_confirmation: valid_user_password()))
 
       {:ok, _lv, html} =
         render_submit(form)
