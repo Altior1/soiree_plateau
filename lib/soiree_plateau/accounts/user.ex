@@ -10,6 +10,8 @@ defmodule SoireePlateau.Accounts.User do
     field :authenticated_at, :utc_datetime, virtual: true
     field :is_admin, :boolean, default: false
 
+    has_many :soirees, SoireePlateau.Teuf.Soiree, foreign_key: :host
+
     timestamps(type: :utc_datetime)
   end
 

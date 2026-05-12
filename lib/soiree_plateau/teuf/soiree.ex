@@ -7,9 +7,9 @@ defmodule SoireePlateau.Teuf.Soiree do
     field :date, :naive_datetime
     field :home, :string
     field :capacity, :integer
-    field :host, :id
-    field :game, :id
-    field :user_id, :id
+    belongs_to :user, SoireePlateau.Accounts.User, foreign_key: :host
+    belongs_to :game, SoireePlateau.Games.Game
+
 
     timestamps(type: :utc_datetime)
   end
@@ -19,6 +19,6 @@ defmodule SoireePlateau.Teuf.Soiree do
     soiree
     |> cast(attrs, [:title, :date, :home, :capacity])
     |> validate_required([:title, :date, :home, :capacity])
-    |> put_change(:user_id, user_scope.user.id)
+    |> put_change(:host, user_scope.user.id)
   end
 end
