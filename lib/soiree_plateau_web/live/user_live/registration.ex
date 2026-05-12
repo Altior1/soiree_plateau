@@ -41,6 +41,14 @@ defmodule SoireePlateauWeb.UserLive.Registration do
             required
           />
 
+          <.input
+            field={@form[:password_confirmation]}
+            type="password"
+            label="Confirm new password"
+            autocomplete="new-password"
+            spellcheck="false"
+          />
+
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
             Create an account
           </.button>
