@@ -23,6 +23,11 @@ defmodule SoireePlateauWeb.GameLive.Show do
       <.list>
         <:item title="Name">{@game.name}</:item>
         <:item title="Description">{@game.description}</:item>
+        <:item title="Image URL" :if={@game.image_url != ""}>{@game.image_url}</:item>
+        <:item title="Minimum Number of Players">{@game.nb_players_min}</:item>
+        <:item title="Maximum Number of Players">{@game.nb_players_max}</:item>
+        <:item title="Duration (minutes)">{@game.duration}</:item>
+        <:item title="Complexity">{@game.complexity}</:item>
       </.list>
     </Layouts.app>
     """

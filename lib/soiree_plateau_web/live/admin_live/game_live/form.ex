@@ -16,6 +16,11 @@ defmodule SoireePlateauWeb.GameLive.Form do
       <.form for={@form} id="game-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:description]} type="textarea" label="Description" />
+        <.input field={@form[:image_url]} type="text" label="Image URL" />
+        <.input field={@form[:nb_players_min]} type="number" label="Minimum Number of Players" />
+        <.input field={@form[:nb_players_max]} type="number" label="Maximum Number of Players" />
+        <.input field={@form[:duration]} type="number" label="Duration (minutes)" />
+        <.input field={@form[:complexity]} type="number" label="Complexity (1-5)" min="1" max="5" />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Game</.button>
           <.button navigate={return_path(@return_to, @game)}>Cancel</.button>
@@ -61,6 +66,11 @@ defmodule SoireePlateauWeb.GameLive.Form do
   end
 
   def handle_event("save", %{"game" => game_params}, socket) do
+    game_params = if game_params["Image URL"] == nil do
+      Map.put(game_params, "image_url", "")
+    else
+      game_params
+    end
     save_game(socket, socket.assigns.live_action, game_params)
   end
 
