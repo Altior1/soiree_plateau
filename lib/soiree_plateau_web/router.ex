@@ -64,7 +64,7 @@ defmodule SoireePlateauWeb.Router do
       live "/soirees/:id/edit", SoireeLive.Form, :edit
     end
 
-    post "/users/update-password", UserSessionController, :update_password
+    post "/update-password", UserSessionController, :update_password
   end
 
   scope "/users", SoireePlateauWeb do
