@@ -52,8 +52,8 @@ defmodule SoireePlateauWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{SoireePlateauWeb.UserAuth, :require_authenticated}] do
-      live "/users/settings", UserLive.Settings, :edit
-      live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/settings", UserLive.Settings, :edit
+      live "/settings/confirm-email/:token", UserLive.Settings, :confirm_email
 
       live "/games", UserLive.Game.ListGames, :index
       live "/games/:id", UserLive.Game.DetailGame, :show
