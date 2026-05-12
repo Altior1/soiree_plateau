@@ -18,7 +18,7 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
         <.input field={@form[:date]} type="datetime-local" label="Date" />
         <.input field={@form[:home]} type="text" label="Home" />
         <.input field={@form[:capacity]} type="number" label="Capacity" />
-        <.input field={@form[:game_id]} type="select" label="Game" options={SoireePlateau.Games.list_games_for_form()} />
+        <.input field={@form[:game_id]} type="select" label="Game" options={@options_games} />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Soiree</.button>
           <.button navigate={return_path(@current_scope, @return_to, @soiree)}>Cancel</.button>
@@ -30,9 +30,12 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
 
   @impl true
   def mount(params, _session, socket) do
+    options_games = SoireePlateau.Games.list_games_for_form()
+
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
+     |> assign(:options_games, options_games)
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -67,8 +70,16 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
 
   def handle_event("save", %{"soiree" => soiree_params}, socket) do
     # on force ici le cast en int de game_id, pour ne pas le catch après ( le changeset sert à la validation aussi )
-    soiree_params = Map.update(soiree_params, "game_id", nil, fn game_id -> if game_id == "", do: nil, else: String.to_integer(game_id) end)
-    save_soiree(socket, socket.assigns.live_action, soiree_params)
+  soiree_params = Map.update(soiree_params, "game_id", nil, fn
+    "" -> nil
+    game_id when is_binary(game_id) ->
+      case Integer.parse(game_id) do
+        {int, _} -> int
+        :error -> nil
+      end
+    game_id -> game_id
+   end)
+  save_soiree(socket, socket.assigns.live_action, soiree_params)
   end
 
   defp save_soiree(socket, :edit, soiree_params) do

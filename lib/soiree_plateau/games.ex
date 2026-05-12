@@ -22,8 +22,8 @@ defmodule SoireePlateau.Games do
   end
 
   @doc """
-  cette fonction est utilisée pour récupérer la liste des jeux dans un format adapté pour les formulaires
-  (une liste de tuples {name, id} triée par nom)
+  Returns the list of games in a format suitable for forms
+  (a list of {name, id} tuples sorted by name).
 
   ## Examples
 

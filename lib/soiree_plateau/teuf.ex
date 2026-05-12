@@ -25,10 +25,17 @@ defmodule SoireePlateau.Teuf do
     Phoenix.PubSub.subscribe(SoireePlateau.PubSub, "user:#{key}:soirees")
   end
 
+  require Logger
+
   defp broadcast_soiree(%Scope{} = scope, message) do
     key = scope.user.id
 
-    Phoenix.PubSub.broadcast(SoireePlateau.PubSub, "user:#{key}:soirees", message)
+    case Phoenix.PubSub.broadcast(SoireePlateau.PubSub, "user:#{key}:soirees", message) do
+      :ok -> :ok
+      {:error, reason} ->
+        Logger.warning("Failed to broadcast soiree event: #{inspect(reason)}")
+        {:error, reason}
+    end
   end
 
   @doc """

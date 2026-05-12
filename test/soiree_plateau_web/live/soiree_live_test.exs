@@ -21,7 +21,9 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
   setup :register_and_log_in_user
 
   defp create_soiree(%{scope: scope}) do
-    soiree = soiree_fixture(scope)
+    game = SoireePlateau.GamesFixtures.game_fixture()
+    attrs = Map.put(@create_attrs, :game_id, game.id)
+    soiree = soiree_fixture(scope, attrs)
 
     %{soiree: soiree}
   end

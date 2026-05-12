@@ -16,9 +16,23 @@ defmodule SoireePlateau.Teuf.Soiree do
   @doc false
   def changeset(soiree, attrs, user_scope) do
     soiree
-    |> cast(attrs, [:title, :date, :home, :capacity, :game_id])
+    |> cast(attrs, [:title, :date, :home, :capacity])
     |> validate_required([:title, :date, :home, :capacity])
+    |> validate_game_exists()
+    |> validate_number(:capacity, greater_than: 0)
+    |> assoc_constraint(:game)
+    |> foreign_key_constraint(:host)
     |> put_change(:host, user_scope.user.id)
-    |> put_change(:game_id, attrs["game_id"])
+    |> put_change(:game_id, attrs[:game_id])
+  end
+
+  defp validate_game_exists(changeset) do
+    game_id = get_field(changeset, :game_id)
+
+    if game_id && !SoireePlateau.Games.get_game(game_id) do
+      add_error(changeset, :game_id, "must reference an existing game")
+    else
+      changeset
+    end
   end
 end

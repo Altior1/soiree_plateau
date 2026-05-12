@@ -3,12 +3,12 @@ defmodule SoireePlateau.Repo.Migrations.CreateSoirees do
 
   def change do
     create table(:soirees) do
-      add :title, :string
-      add :date, :naive_datetime
+      add :title, :string, null: false
+      add :date, :naive_datetime, null: false
       add :home, :string
-      add :capacity, :integer
+      add :capacity, :integer, null: false
       add :host, references(:users, on_delete: :delete_all)
-      add :game_id, references(:games, on_delete: :nothing)
+      add :game_id, references(:games, on_delete: :nilify_all)
 
       timestamps(type: :utc_datetime)
     end
