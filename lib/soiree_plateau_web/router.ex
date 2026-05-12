@@ -68,7 +68,8 @@ defmodule SoireePlateauWeb.Router do
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/:token", UserLive.Confirmation, :new
 
-      live "/users/list-games", UserLive.ListGames, :index
+      live "/users/list-games", UserLive.Game.ListGames, :index
+      live "/users/games/:id", UserLive.Game.DetailGame, :show
     end
 
     post "/users/log-in", UserSessionController, :create
