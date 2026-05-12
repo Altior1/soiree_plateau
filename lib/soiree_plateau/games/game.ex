@@ -13,6 +13,8 @@ defmodule SoireePlateau.Games.Game do
     # de 1 à 5
     field :complexity, :integer
 
+    has_many :soirees, SoireePlateau.Teuf.Soiree
+
     timestamps(type: :utc_datetime)
   end
 
