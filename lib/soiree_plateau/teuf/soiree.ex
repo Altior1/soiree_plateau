@@ -16,7 +16,7 @@ defmodule SoireePlateau.Teuf.Soiree do
   @doc false
   def changeset(soiree, attrs, user_scope) do
     soiree
-    |> cast(attrs, [:title, :date, :home, :capacity])
+    |> cast(attrs, [:title, :date, :home, :capacity, :game_id])
     |> validate_required([:title, :date, :home, :capacity])
     |> validate_game_exists()
     |> validate_number(:capacity, greater_than: 0)
