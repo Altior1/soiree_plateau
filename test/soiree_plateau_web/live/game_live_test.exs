@@ -7,16 +7,16 @@ defmodule SoireePlateauWeb.GameLiveTest do
   @create_attrs %{
     name: "some name",
     description: "some description",
-    min_players: 1,
-    max_players: 4,
+    nb_players_min: 1,
+    nb_players_max: 4,
     duration: 30,
     complexity: 3
   }
   @update_attrs %{
     name: "some updated name",
     description: "some updated description",
-    min_players: 2,
-    max_players: 5,
+    nb_players_min: 2,
+    nb_players_max: 5,
     duration: 45,
     complexity: 4
   }

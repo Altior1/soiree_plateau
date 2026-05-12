@@ -21,7 +21,14 @@ defmodule SoireePlateau.GamesTest do
     end
 
     test "create_game/1 with valid data creates a game" do
-      valid_attrs = %{name: "some name", description: "some description"}
+      valid_attrs = %{
+        name: "some name",
+        description: "some description",
+        complexity: 3,
+        duration: 30,
+        nb_players_max: 4,
+        nb_players_min: 1
+      }
 
       assert {:ok, %Game{} = game} = Games.create_game(valid_attrs)
       assert game.name == "some name"
@@ -34,7 +41,15 @@ defmodule SoireePlateau.GamesTest do
 
     test "update_game/2 with valid data updates the game" do
       game = game_fixture()
-      update_attrs = %{name: "some updated name", description: "some updated description"}
+
+      update_attrs = %{
+        name: "some updated name",
+        description: "some updated description",
+        complexity: 4,
+        duration: 45,
+        nb_players_max: 5,
+        nb_players_min: 2
+      }
 
       assert {:ok, %Game{} = game} = Games.update_game(game, update_attrs)
       assert game.name == "some updated name"
