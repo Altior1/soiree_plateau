@@ -12,7 +12,11 @@ defmodule SoireePlateau.GamesFixtures do
       attrs
       |> Enum.into(%{
         description: "some description",
-        name: "some name"
+        name: "some name",
+        complexity: 3,
+        duration: 30,
+        nb_players_max: 4,
+        nb_players_min: 1
       })
       |> SoireePlateau.Games.create_game()
 

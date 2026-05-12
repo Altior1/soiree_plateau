@@ -37,6 +37,8 @@ defmodule SoireePlateau.Games do
   """
   def get_game!(id), do: Repo.get!(Game, id)
 
+  def get_game(id), do: Repo.get(Game, id)
+
   @doc """
   Creates a game.
 
