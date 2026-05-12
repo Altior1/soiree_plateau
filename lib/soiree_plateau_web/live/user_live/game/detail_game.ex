@@ -17,9 +17,7 @@ defmodule SoireePlateauWeb.UserLive.Game.DetailGame do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-
-        <GamesComponents.game_details game={@game} />
-
+      <GamesComponents.game_details game={@game} />
     </Layouts.app>
     """
   end

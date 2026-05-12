@@ -66,11 +66,13 @@ defmodule SoireePlateauWeb.GameLive.Form do
   end
 
   def handle_event("save", %{"game" => game_params}, socket) do
-    game_params = if game_params["Image URL"] == nil do
-      Map.put(game_params, "image_url", "")
-    else
-      game_params
-    end
+    game_params =
+      if game_params["Image URL"] == nil do
+        Map.put(game_params, "image_url", "")
+      else
+        game_params
+      end
+
     save_game(socket, socket.assigns.live_action, game_params)
   end
 

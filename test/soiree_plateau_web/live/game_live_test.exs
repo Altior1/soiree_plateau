@@ -4,8 +4,22 @@ defmodule SoireePlateauWeb.GameLiveTest do
   import Phoenix.LiveViewTest
   import SoireePlateau.GamesFixtures
 
-  @create_attrs %{name: "some name", description: "some description"}
-  @update_attrs %{name: "some updated name", description: "some updated description"}
+  @create_attrs %{
+    name: "some name",
+    description: "some description",
+    min_players: 1,
+    max_players: 4,
+    duration: 30,
+    complexity: 3
+  }
+  @update_attrs %{
+    name: "some updated name",
+    description: "some updated description",
+    min_players: 2,
+    max_players: 5,
+    duration: 45,
+    complexity: 4
+  }
   @invalid_attrs %{name: nil, description: nil}
   defp create_game(_) do
     game = game_fixture()

@@ -41,7 +41,6 @@ defmodule SoireePlateauWeb.Layouts do
           <li>
             <.theme_toggle />
           </li>
-
         </ul>
       </div>
     </header>
