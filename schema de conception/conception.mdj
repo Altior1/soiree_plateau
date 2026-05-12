@@ -7473,7 +7473,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGeFe0yAEcBvfg="
 					},
-					"name": "ClassDiagram1",
+					"name": "BDD",
 					"ownedViews": [
 						{
 							"_type": "UMLClassView",
@@ -10669,7 +10669,7 @@
 									"_parent": {
 										"$ref": "AAAAAAGeF9Fm9fKh/5I="
 									},
-									"name": "SequenceDiagram1",
+									"name": "gestion de la presence en soiree",
 									"ownedViews": [
 										{
 											"_type": "UMLFrameView",
@@ -10691,9 +10691,9 @@
 													"parentStyle": true,
 													"left": 24.72998046875,
 													"top": 5,
-													"width": 114.9052734375,
+													"width": 187.9033203125,
 													"height": 13,
-													"text": "SequenceDiagram1"
+													"text": "gestion de la presence en soiree"
 												},
 												{
 													"_type": "LabelView",
@@ -11980,6 +11980,675 @@
 								"$ref": "AAAAAAGeF9Fm9fKgq+w="
 							},
 							"name": "Role4"
+						}
+					]
+				}
+			]
+		},
+		{
+			"_type": "WFWireframe",
+			"_id": "AAAAAAGeF9sWHPSHbxU=",
+			"_parent": {
+				"$ref": "AAAAAAFF+h6SjaM2Hec="
+			},
+			"name": "Wireframe1",
+			"ownedElements": [
+				{
+					"_type": "WFWireframeDiagram",
+					"_id": "AAAAAAGeF9sWHPSImCE=",
+					"_parent": {
+						"$ref": "AAAAAAGeF9sWHPSHbxU="
+					},
+					"name": "conception du layout",
+					"ownedViews": [
+						{
+							"_type": "WFWebFrameView",
+							"_id": "AAAAAAGeF9tm9PSzcZE=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF9tm8/SxtLY="
+							},
+							"containedViews": [
+								{
+									"$ref": "AAAAAAGeF+AIbfb8Xdk="
+								},
+								{
+									"$ref": "AAAAAAGeF+DpRPcT9zA="
+								},
+								{
+									"$ref": "AAAAAAGeF+Eex/ccDMg="
+								},
+								{
+									"$ref": "AAAAAAGeF+HyZfcqKYU="
+								},
+								{
+									"$ref": "AAAAAAGeF+Ie7vcvIJE="
+								}
+							],
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"left": 232,
+							"top": 120,
+							"width": 568,
+							"height": 408
+						},
+						{
+							"_type": "UMLTextView",
+							"_id": "AAAAAAGeF93zLvTEGkM=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"left": 216,
+							"top": 72,
+							"width": 60,
+							"height": 15
+						},
+						{
+							"_type": "WFAvatarView",
+							"_id": "AAAAAAGeF+AIbfb8Xdk=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+AIbfb6JWA="
+							},
+							"containerView": {
+								"$ref": "AAAAAAGeF9tm9PSzcZE="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 760,
+							"top": 152,
+							"width": 24,
+							"height": 24
+						},
+						{
+							"_type": "WFButtonView",
+							"_id": "AAAAAAGeF+DpRPcT9zA=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+DpQ/cRvrU="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAGeF+DpRPcULFE=",
+									"_parent": {
+										"$ref": "AAAAAAGeF+DpRPcT9zA="
+									},
+									"font": "Arial;13;0",
+									"parentStyle": true,
+									"left": 272,
+									"top": 168,
+									"width": 104,
+									"height": 13,
+									"text": "acces aux jeux",
+									"wordWrap": true
+								}
+							],
+							"containerView": {
+								"$ref": "AAAAAAGeF9tm9PSzcZE="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 272,
+							"top": 160,
+							"width": 104,
+							"height": 25,
+							"nameLabel": {
+								"$ref": "AAAAAAGeF+DpRPcULFE="
+							}
+						},
+						{
+							"_type": "WFButtonView",
+							"_id": "AAAAAAGeF+Eex/ccDMg=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+Eex/caZmE="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAGeF+Eex/cdRls=",
+									"_parent": {
+										"$ref": "AAAAAAGeF+Eex/ccDMg="
+									},
+									"font": "Arial;13;0",
+									"parentStyle": true,
+									"left": 624,
+									"top": 168,
+									"width": 112,
+									"height": 13,
+									"text": "acces aux soirees",
+									"wordWrap": true
+								}
+							],
+							"containerView": {
+								"$ref": "AAAAAAGeF9tm9PSzcZE="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 624,
+							"top": 160,
+							"width": 112,
+							"height": 25,
+							"nameLabel": {
+								"$ref": "AAAAAAGeF+Eex/cdRls="
+							}
+						},
+						{
+							"_type": "WFImageView",
+							"_id": "AAAAAAGeF+HyZfcqKYU=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+HyZfco3dE="
+							},
+							"containerView": {
+								"$ref": "AAAAAAGeF9tm9PSzcZE="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 472,
+							"top": 160,
+							"width": 88,
+							"height": 48
+						},
+						{
+							"_type": "WFTextView",
+							"_id": "AAAAAAGeF+Ie7vcvIJE=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+Ie7fctY9c="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAGeF+Ie7vcwT10=",
+									"_parent": {
+										"$ref": "AAAAAAGeF+Ie7vcvIJE="
+									},
+									"font": "Arial;13;0",
+									"parentStyle": true,
+									"left": 496,
+									"top": 216,
+									"width": 31.07177734375,
+									"height": 13,
+									"text": "logo",
+									"horizontalAlignment": 0,
+									"wordWrap": true
+								}
+							],
+							"containerView": {
+								"$ref": "AAAAAAGeF9tm9PSzcZE="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 496,
+							"top": 216,
+							"width": 31.07177734375,
+							"height": 13,
+							"nameLabel": {
+								"$ref": "AAAAAAGeF+Ie7vcwT10="
+							}
+						},
+						{
+							"_type": "WFFrameView",
+							"_id": "AAAAAAGeF+KQ1/c54yQ=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+KQ1/c3X98="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"left": 232,
+							"top": 248,
+							"width": 568,
+							"height": 280
+						},
+						{
+							"_type": "UMLTextView",
+							"_id": "AAAAAAGeF+K9KPc8EsY=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9sWHPSImCE="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"left": 472,
+							"top": 368,
+							"width": 77.5263671875,
+							"height": 38,
+							"text": "corps de l'application"
+						}
+					]
+				},
+				{
+					"_type": "WFFrame",
+					"_id": "AAAAAAGeF9slxPSq+OM=",
+					"_parent": {
+						"$ref": "AAAAAAGeF9sWHPSHbxU="
+					},
+					"name": "Frame1"
+				},
+				{
+					"_type": "WFWebFrame",
+					"_id": "AAAAAAGeF9tm8/SxtLY=",
+					"_parent": {
+						"$ref": "AAAAAAGeF9sWHPSHbxU="
+					},
+					"name": "WebFrame1",
+					"ownedElements": [
+						{
+							"_type": "WFAvatar",
+							"_id": "AAAAAAGeF+AIbfb6JWA=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9tm8/SxtLY="
+							},
+							"name": "Avatar1"
+						},
+						{
+							"_type": "WFButton",
+							"_id": "AAAAAAGeF+DpQ/cRvrU=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9tm8/SxtLY="
+							},
+							"name": "acces aux jeux"
+						},
+						{
+							"_type": "WFButton",
+							"_id": "AAAAAAGeF+Eex/caZmE=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9tm8/SxtLY="
+							},
+							"name": "acces aux soirees"
+						},
+						{
+							"_type": "WFImage",
+							"_id": "AAAAAAGeF+HyZfco3dE=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9tm8/SxtLY="
+							},
+							"name": "Image1"
+						},
+						{
+							"_type": "WFText",
+							"_id": "AAAAAAGeF+Ie7fctY9c=",
+							"_parent": {
+								"$ref": "AAAAAAGeF9tm8/SxtLY="
+							},
+							"name": "logo"
+						}
+					]
+				},
+				{
+					"_type": "WFButton",
+					"_id": "AAAAAAGeF9ugAfS7Zvs=",
+					"_parent": {
+						"$ref": "AAAAAAGeF9sWHPSHbxU="
+					},
+					"name": "Button1"
+				},
+				{
+					"_type": "WFFrame",
+					"_id": "AAAAAAGeF+BMtPcALJM=",
+					"_parent": {
+						"$ref": "AAAAAAGeF9sWHPSHbxU="
+					},
+					"name": "Frame2"
+				},
+				{
+					"_type": "WFFrame",
+					"_id": "AAAAAAGeF+C1o/cJCNs=",
+					"_parent": {
+						"$ref": "AAAAAAGeF9sWHPSHbxU="
+					},
+					"name": "Frame3"
+				},
+				{
+					"_type": "WFFrame",
+					"_id": "AAAAAAGeF+KQ1/c3X98=",
+					"_parent": {
+						"$ref": "AAAAAAGeF9sWHPSHbxU="
+					},
+					"name": "Frame4"
+				}
+			]
+		},
+		{
+			"_type": "WFWireframe",
+			"_id": "AAAAAAGeF+NKpPdFqkc=",
+			"_parent": {
+				"$ref": "AAAAAAFF+h6SjaM2Hec="
+			},
+			"name": "Wireframe2",
+			"ownedElements": [
+				{
+					"_type": "WFWireframeDiagram",
+					"_id": "AAAAAAGeF+NKpPdGe6g=",
+					"_parent": {
+						"$ref": "AAAAAAGeF+NKpPdFqkc="
+					},
+					"name": "conception du RSVP",
+					"ownedViews": [
+						{
+							"_type": "WFFrameView",
+							"_id": "AAAAAAGeF+O8qvdrDHY=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+NKpPdGe6g="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+O8qfdpjDg="
+							},
+							"containedViews": [
+								{
+									"$ref": "AAAAAAGeF+PSC/dwxk4="
+								},
+								{
+									"$ref": "AAAAAAGeF+P/ufeFaI0="
+								},
+								{
+									"$ref": "AAAAAAGeF+QLofeN0hU="
+								},
+								{
+									"$ref": "AAAAAAGeF+glqve0CdU="
+								},
+								{
+									"$ref": "AAAAAAGeF+jYwfe+Do0="
+								}
+							],
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"left": 288,
+							"top": 176,
+							"width": 448,
+							"height": 152
+						},
+						{
+							"_type": "WFRadioView",
+							"_id": "AAAAAAGeF+PSC/dwxk4=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+NKpPdGe6g="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+PSC/duQhw="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAGeF+PSC/dxP0E=",
+									"_parent": {
+										"$ref": "AAAAAAGeF+PSC/dwxk4="
+									},
+									"font": "Arial;13;0",
+									"parentStyle": true,
+									"left": 402,
+									"top": 290,
+									"width": 41.1962890625,
+									"height": 13,
+									"text": "oui",
+									"horizontalAlignment": 0,
+									"wordWrap": true
+								}
+							],
+							"containerView": {
+								"$ref": "AAAAAAGeF+O8qvdrDHY="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 384,
+							"top": 288,
+							"width": 59.1962890625,
+							"height": 13,
+							"nameLabel": {
+								"$ref": "AAAAAAGeF+PSC/dxP0E="
+							}
+						},
+						{
+							"_type": "WFRadioView",
+							"_id": "AAAAAAGeF+P/ufeFaI0=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+NKpPdGe6g="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+P/ufeDY7w="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAGeF+P/ufeGOWI=",
+									"_parent": {
+										"$ref": "AAAAAAGeF+P/ufeFaI0="
+									},
+									"font": "Arial;13;0",
+									"parentStyle": true,
+									"left": 626,
+									"top": 290,
+									"width": 41.1962890625,
+									"height": 13,
+									"text": "non",
+									"horizontalAlignment": 0,
+									"wordWrap": true
+								}
+							],
+							"containerView": {
+								"$ref": "AAAAAAGeF+O8qvdrDHY="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 608,
+							"top": 288,
+							"width": 59.1962890625,
+							"height": 13,
+							"nameLabel": {
+								"$ref": "AAAAAAGeF+P/ufeGOWI="
+							}
+						},
+						{
+							"_type": "WFRadioView",
+							"_id": "AAAAAAGeF+QLofeN0hU=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+NKpPdGe6g="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+QLofeLTlQ="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAGeF+QLofeOr78=",
+									"_parent": {
+										"$ref": "AAAAAAGeF+QLofeN0hU="
+									},
+									"font": "Arial;13;0",
+									"parentStyle": true,
+									"left": 522,
+									"top": 282,
+									"width": 41.1962890625,
+									"height": 26,
+									"text": "peut etre",
+									"horizontalAlignment": 0,
+									"wordWrap": true
+								}
+							],
+							"containerView": {
+								"$ref": "AAAAAAGeF+O8qvdrDHY="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 504,
+							"top": 280,
+							"width": 59.1962890625,
+							"height": 26,
+							"nameLabel": {
+								"$ref": "AAAAAAGeF+QLofeOr78="
+							}
+						},
+						{
+							"_type": "WFTextView",
+							"_id": "AAAAAAGeF+glqve0CdU=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+NKpPdGe6g="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+glqfeyPog="
+							},
+							"subViews": [
+								{
+									"_type": "LabelView",
+									"_id": "AAAAAAGeF+glqve1T9w=",
+									"_parent": {
+										"$ref": "AAAAAAGeF+glqve0CdU="
+									},
+									"font": "Arial;13;0",
+									"parentStyle": true,
+									"left": 416,
+									"top": 208,
+									"width": 64.30810546875,
+									"height": 39,
+									"text": "information de l'invitation",
+									"horizontalAlignment": 0,
+									"wordWrap": true
+								}
+							],
+							"containerView": {
+								"$ref": "AAAAAAGeF+O8qvdrDHY="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 416,
+							"top": 208,
+							"width": 64.30810546875,
+							"height": 39,
+							"nameLabel": {
+								"$ref": "AAAAAAGeF+glqve1T9w="
+							}
+						},
+						{
+							"_type": "WFImageView",
+							"_id": "AAAAAAGeF+jYwfe+Do0=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+NKpPdGe6g="
+							},
+							"model": {
+								"$ref": "AAAAAAGeF+jYwPe8Udw="
+							},
+							"containerView": {
+								"$ref": "AAAAAAGeF+O8qvdrDHY="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"containerChangeable": true,
+							"left": 584,
+							"top": 200,
+							"width": 88,
+							"height": 56
+						},
+						{
+							"_type": "UMLTextView",
+							"_id": "AAAAAAGeF+j3NvfDFiw=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+NKpPdGe6g="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"left": 592,
+							"top": 200,
+							"width": 68.54443359375,
+							"height": 51,
+							"text": "image du jeu si disponible"
+						},
+						{
+							"_type": "UMLTextView",
+							"_id": "AAAAAAGeF+msB/fKJzI=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+NKpPdGe6g="
+							},
+							"font": "Arial;13;0",
+							"parentStyle": false,
+							"left": 416,
+							"top": 336,
+							"width": 77.20263671875,
+							"height": 51
+						}
+					]
+				},
+				{
+					"_type": "WFFrame",
+					"_id": "AAAAAAGeF+O8qfdpjDg=",
+					"_parent": {
+						"$ref": "AAAAAAGeF+NKpPdFqkc="
+					},
+					"name": "Frame1",
+					"ownedElements": [
+						{
+							"_type": "WFRadio",
+							"_id": "AAAAAAGeF+PSC/duQhw=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+O8qfdpjDg="
+							},
+							"name": "oui"
+						},
+						{
+							"_type": "WFButton",
+							"_id": "AAAAAAGeF+Ps0/d3bS0=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+O8qfdpjDg="
+							},
+							"name": "Button1"
+						},
+						{
+							"_type": "WFRadio",
+							"_id": "AAAAAAGeF+P/ufeDY7w=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+O8qfdpjDg="
+							},
+							"name": "non"
+						},
+						{
+							"_type": "WFRadio",
+							"_id": "AAAAAAGeF+QLofeLTlQ=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+O8qfdpjDg="
+							},
+							"name": "peut etre"
+						},
+						{
+							"_type": "WFText",
+							"_id": "AAAAAAGeF+glqfeyPog=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+O8qfdpjDg="
+							},
+							"name": "information de l'invitation"
+						},
+						{
+							"_type": "WFImage",
+							"_id": "AAAAAAGeF+jYwPe8Udw=",
+							"_parent": {
+								"$ref": "AAAAAAGeF+O8qfdpjDg="
+							},
+							"name": "Image1"
 						}
 					]
 				}
