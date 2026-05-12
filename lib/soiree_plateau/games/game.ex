@@ -5,6 +5,11 @@ defmodule SoireePlateau.Games.Game do
   schema "games" do
     field :name, :string
     field :description, :string
+    field :image_url, :string
+    field :nb_players_min, :integer
+    field :nb_players_max, :integer
+    field :duration, :integer # durée en minutes
+    field :complexity, :integer # de 1 à 5
 
     timestamps(type: :utc_datetime)
   end

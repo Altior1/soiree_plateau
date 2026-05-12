@@ -11,10 +11,15 @@ defmodule SoireePlateauWeb.GamesComponents.GamesComponents do
     ~H"""
     <div class="game-card bg-white rounded-lg shadow-md p-4 ">
       <div :if={@game.image_url != ""} class="game-card-image-container mb-4">
-        <img src ={@game.image_url} alt={"Image de #{@game.title}"} class="game-card-image mb-4 rounded" />
+        <img src ={@game.image_url} alt={"Image de #{@game.name}"} class="game-card-image mb-4 rounded" />
       </div>
-      <h3 class="game-card-title">{@game.title}</h3>
+      <h3 class="game-card-title">{@game.name}</h3>
       <p class="game-card-description">{@game.description}</p>
+      <div class="game-card-info mt-4">
+        <p><strong>Nombre de joueurs :</strong> {@game.nb_players_min} - {@game.nb_players_max}</p>
+        <p><strong>Durée :</strong> {@game.duration} minutes</p>
+        <p><strong>Complexité :</strong> {@game.complexity}/5</p>
+      </div>
     </div>
     """
   end
