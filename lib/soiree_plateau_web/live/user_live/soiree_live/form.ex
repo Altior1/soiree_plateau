@@ -98,6 +98,6 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
     end
   end
 
-  defp return_path(_scope, "index", _soiree), do: ~p"/soirees"
-  defp return_path(_scope, "show", soiree), do: ~p"/soirees/#{soiree}"
+  defp return_path(_scope, "index", _soiree), do: ~p"/users/soirees"
+  defp return_path(_scope, "show", soiree), do: ~p"/users/soirees/#{soiree}"
 end

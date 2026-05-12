@@ -10,7 +10,7 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
       <.header>
         Listing Soirees
         <:actions>
-          <.button variant="primary" navigate={~p"/soirees/new"}>
+          <.button variant="primary" navigate={~p"/users/soirees/new"}>
             <.icon name="hero-plus" /> New Soiree
           </.button>
         </:actions>
@@ -19,7 +19,7 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
       <.table
         id="soirees"
         rows={@streams.soirees}
-        row_click={fn {_id, soiree} -> JS.navigate(~p"/soirees/#{soiree}") end}
+        row_click={fn {_id, soiree} -> JS.navigate(~p"/users/soirees/#{soiree}") end}
       >
         <:col :let={{_id, soiree}} label="Title">{soiree.title}</:col>
         <:col :let={{_id, soiree}} label="Date">{soiree.date}</:col>
@@ -27,9 +27,9 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
         <:col :let={{_id, soiree}} label="Capacity">{soiree.capacity}</:col>
         <:action :let={{_id, soiree}}>
           <div class="sr-only">
-            <.link navigate={~p"/soirees/#{soiree}"}>Show</.link>
+            <.link navigate={~p"/users/soirees/#{soiree}"}>Show</.link>
           </div>
-          <.link navigate={~p"/soirees/#{soiree}/edit"}>Edit</.link>
+          <.link navigate={~p"/users/soirees/#{soiree}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, soiree}}>
           <.link

@@ -10,7 +10,6 @@ defmodule SoireePlateau.Teuf.Soiree do
     belongs_to :user, SoireePlateau.Accounts.User, foreign_key: :host
     belongs_to :game, SoireePlateau.Games.Game
 
-
     timestamps(type: :utc_datetime)
   end
 

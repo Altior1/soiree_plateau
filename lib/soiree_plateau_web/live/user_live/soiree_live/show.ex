@@ -11,10 +11,10 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
         Soiree {@soiree.id}
         <:subtitle>This is a soiree record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/soirees"}>
+          <.button navigate={~p"/users/soirees"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/soirees/#{@soiree}/edit?return_to=show"}>
+          <.button variant="primary" navigate={~p"/users/soirees/#{@soiree}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> Edit soiree
           </.button>
         </:actions>
@@ -57,7 +57,7 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
     {:noreply,
      socket
      |> put_flash(:error, "The current soiree was deleted.")
-     |> push_navigate(to: ~p"/soirees")}
+     |> push_navigate(to: ~p"/users/soirees")}
   end
 
   def handle_info({type, %SoireePlateau.Teuf.Soiree{}}, socket)

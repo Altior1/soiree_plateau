@@ -27,7 +27,7 @@ defmodule SoireePlateauWeb.UserLive.LoginTest do
 
       assert html =~ "If your email is in our system"
 
-      assert SoireePlateau.Repo.get_by!(SoireePlateau.Accounts.UserToken, host: user.id).context ==
+      assert SoireePlateau.Repo.get_by!(SoireePlateau.Accounts.UserToken, user_id: user.id).context ==
                "login"
     end
 

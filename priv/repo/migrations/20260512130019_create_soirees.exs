@@ -8,13 +8,13 @@ defmodule SoireePlateau.Repo.Migrations.CreateSoirees do
       add :home, :string
       add :capacity, :integer
       add :host, references(:users, on_delete: :delete_all)
-      add :game, references(:games, on_delete: :nothing)
+      add :game_id, references(:games, on_delete: :nothing)
 
 
       timestamps(type: :utc_datetime)
     end
 
     create index(:soirees, [:host])
-    create index(:soirees, [:game])
+    create index(:soirees, [:game_id])
   end
 end

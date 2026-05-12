@@ -30,20 +30,20 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
     setup [:create_soiree]
 
     test "lists all soirees", %{conn: conn, soiree: soiree} do
-      {:ok, _index_live, html} = live(conn, ~p"/soirees")
+      {:ok, _index_live, html} = live(conn, ~p"/users/soirees")
 
       assert html =~ "Listing Soirees"
       assert html =~ soiree.title
     end
 
     test "saves new soiree", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/soirees")
+      {:ok, index_live, _html} = live(conn, ~p"/users/soirees")
 
       assert {:ok, form_live, _} =
                index_live
                |> element("a", "New Soiree")
                |> render_click()
-               |> follow_redirect(conn, ~p"/soirees/new")
+               |> follow_redirect(conn, ~p"/users/soirees/new")
 
       assert render(form_live) =~ "New Soiree"
 
@@ -55,7 +55,7 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
                form_live
                |> form("#soiree-form", soiree: @create_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/soirees")
+               |> follow_redirect(conn, ~p"/users/soirees")
 
       html = render(index_live)
       assert html =~ "Soiree created successfully"
@@ -63,13 +63,13 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
     end
 
     test "updates soiree in listing", %{conn: conn, soiree: soiree} do
-      {:ok, index_live, _html} = live(conn, ~p"/soirees")
+      {:ok, index_live, _html} = live(conn, ~p"/users/soirees")
 
       assert {:ok, form_live, _html} =
                index_live
                |> element("#soirees-#{soiree.id} a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/soirees/#{soiree}/edit")
+               |> follow_redirect(conn, ~p"/users/soirees/#{soiree}/edit")
 
       assert render(form_live) =~ "Edit Soiree"
 
@@ -81,7 +81,7 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
                form_live
                |> form("#soiree-form", soiree: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/soirees")
+               |> follow_redirect(conn, ~p"/users/soirees")
 
       html = render(index_live)
       assert html =~ "Soiree updated successfully"
@@ -89,7 +89,7 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
     end
 
     test "deletes soiree in listing", %{conn: conn, soiree: soiree} do
-      {:ok, index_live, _html} = live(conn, ~p"/soirees")
+      {:ok, index_live, _html} = live(conn, ~p"/users/soirees")
 
       assert index_live |> element("#soirees-#{soiree.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#soirees-#{soiree.id}")
@@ -100,20 +100,20 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
     setup [:create_soiree]
 
     test "displays soiree", %{conn: conn, soiree: soiree} do
-      {:ok, _show_live, html} = live(conn, ~p"/soirees/#{soiree}")
+      {:ok, _show_live, html} = live(conn, ~p"/users/soirees/#{soiree}")
 
       assert html =~ "Show Soiree"
       assert html =~ soiree.title
     end
 
     test "updates soiree and returns to show", %{conn: conn, soiree: soiree} do
-      {:ok, show_live, _html} = live(conn, ~p"/soirees/#{soiree}")
+      {:ok, show_live, _html} = live(conn, ~p"/users/soirees/#{soiree}")
 
       assert {:ok, form_live, _} =
                show_live
                |> element("a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/soirees/#{soiree}/edit?return_to=show")
+               |> follow_redirect(conn, ~p"/users/soirees/#{soiree}/edit?return_to=show")
 
       assert render(form_live) =~ "Edit Soiree"
 
@@ -125,7 +125,7 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
                form_live
                |> form("#soiree-form", soiree: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/soirees/#{soiree}")
+               |> follow_redirect(conn, ~p"/users/soirees/#{soiree}")
 
       html = render(show_live)
       assert html =~ "Soiree updated successfully"

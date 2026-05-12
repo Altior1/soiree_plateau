@@ -47,29 +47,16 @@ defmodule SoireePlateauWeb.Router do
 
   ## Authentication routes
 
-  scope "/", SoireePlateauWeb do
+  scope "/users", SoireePlateauWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
       on_mount: [{SoireePlateauWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
-    end
 
-    post "/users/update-password", UserSessionController, :update_password
-  end
-
-  scope "/", SoireePlateauWeb do
-    pipe_through [:browser]
-
-    live_session :current_user,
-      on_mount: [{SoireePlateauWeb.UserAuth, :mount_current_scope}] do
-      live "/users/register", UserLive.Registration, :new
-      live "/users/log-in", UserLive.Login, :new
-      live "/users/log-in/:token", UserLive.Confirmation, :new
-
-      live "/users/list-games", UserLive.Game.ListGames, :index
-      live "/users/games/:id", UserLive.Game.DetailGame, :show
+      live "/games", UserLive.Game.ListGames, :index
+      live "/games/:id", UserLive.Game.DetailGame, :show
 
       live "/soirees", SoireeLive.Index, :index
       live "/soirees/new", SoireeLive.Form, :new
@@ -77,8 +64,23 @@ defmodule SoireePlateauWeb.Router do
       live "/soirees/:id/edit", SoireeLive.Form, :edit
     end
 
-    post "/users/log-in", UserSessionController, :create
-    delete "/users/log-out", UserSessionController, :delete
+    post "/users/update-password", UserSessionController, :update_password
+  end
+
+  scope "/users", SoireePlateauWeb do
+    pipe_through [:browser]
+
+    live_session :current_user,
+      on_mount: [{SoireePlateauWeb.UserAuth, :mount_current_scope}] do
+      live "/register", UserLive.Registration, :new
+      live "/log-in", UserLive.Login, :new
+      live "/log-in/:token", UserLive.Confirmation, :new
+
+
+    end
+
+    post "/log-in", UserSessionController, :create
+    delete "/log-out", UserSessionController, :delete
   end
 
   scope "/admin", SoireePlateauWeb do
