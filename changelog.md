@@ -4,4 +4,4 @@ s=> MVP ( journée du mardi)
 - [X] : les admnins peuvent gérer les jeux
 - [X] : les utilisateurs peuvent consulter la liste des jeux
 - [X] : les utilisateurs peuvent consulter les détails d'un jeu
-- [ ] : 
+- [ ] : les utilisateurs peuvent créer une soirée

@@ -70,6 +70,11 @@ defmodule SoireePlateauWeb.Router do
 
       live "/users/list-games", UserLive.Game.ListGames, :index
       live "/users/games/:id", UserLive.Game.DetailGame, :show
+
+      live "/soirees", SoireeLive.Index, :index
+      live "/soirees/new", SoireeLive.Form, :new
+      live "/soirees/:id", SoireeLive.Show, :show
+      live "/soirees/:id/edit", SoireeLive.Form, :edit
     end
 
     post "/users/log-in", UserSessionController, :create
