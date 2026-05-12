@@ -17,7 +17,9 @@ defmodule SoireePlateau.TeufFixtures do
       })
 
     case SoireePlateau.Teuf.create_soiree(scope, attrs) do
-      {:ok, soiree} -> soiree
+      {:ok, soiree} ->
+        soiree
+
       {:error, changeset} ->
         raise "Failed to create soiree fixture: #{inspect(changeset.errors)}"
     end

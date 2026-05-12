@@ -35,6 +35,7 @@ defmodule SoireePlateau.TeufTest do
         title: "some title",
         capacity: 42
       }
+
       game = SoireePlateau.GamesFixtures.game_fixture()
       valid_attrs = Map.put(valid_attrs, :game_id, game.id)
       scope = user_scope_fixture()
