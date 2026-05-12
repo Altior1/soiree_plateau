@@ -48,7 +48,7 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
   end
 
   defp apply_action(socket, :new, _params) do
-    soiree = %Soiree{user_id: socket.assigns.current_scope.user.id}
+    soiree = %Soiree{host: socket.assigns.current_scope.user.id}
 
     socket
     |> assign(:page_title, "New Soiree")

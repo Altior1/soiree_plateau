@@ -43,7 +43,7 @@ defmodule SoireePlateau.TeufTest do
       assert soiree.home == "some home"
       assert soiree.title == "some title"
       assert soiree.capacity == 42
-      assert soiree.user_id == scope.user.id
+      assert soiree.host == scope.user.id
     end
 
     test "create_soiree/2 with invalid data returns error changeset" do

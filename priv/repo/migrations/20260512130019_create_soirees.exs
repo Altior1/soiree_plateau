@@ -7,14 +7,12 @@ defmodule SoireePlateau.Repo.Migrations.CreateSoirees do
       add :date, :naive_datetime
       add :home, :string
       add :capacity, :integer
-      add :host, references(:User, on_delete: :nothing)
-      add :game, references(:Game, on_delete: :nothing)
-      add :user_id, references(:users, on_delete: :delete_all)
+      add :host, references(:users, on_delete: :delete_all)
+      add :game, references(:games, on_delete: :nothing)
+
 
       timestamps(type: :utc_datetime)
     end
-
-    create index(:soirees, [:user_id])
 
     create index(:soirees, [:host])
     create index(:soirees, [:game])

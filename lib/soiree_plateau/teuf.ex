@@ -41,7 +41,7 @@ defmodule SoireePlateau.Teuf do
 
   """
   def list_soirees(%Scope{} = scope) do
-    Repo.all_by(Soiree, user_id: scope.user.id)
+    Repo.all_by(Soiree, host: scope.user.id)
   end
 
   @doc """
@@ -59,7 +59,7 @@ defmodule SoireePlateau.Teuf do
 
   """
   def get_soiree!(%Scope{} = scope, id) do
-    Repo.get_by!(Soiree, id: id, user_id: scope.user.id)
+    Repo.get_by!(Soiree, id: id, host: scope.user.id)
   end
 
   @doc """
@@ -97,7 +97,7 @@ defmodule SoireePlateau.Teuf do
 
   """
   def update_soiree(%Scope{} = scope, %Soiree{} = soiree, attrs) do
-    true = soiree.user_id == scope.user.id
+    true = soiree.host == scope.user.id
 
     with {:ok, soiree = %Soiree{}} <-
            soiree
@@ -121,7 +121,7 @@ defmodule SoireePlateau.Teuf do
 
   """
   def delete_soiree(%Scope{} = scope, %Soiree{} = soiree) do
-    true = soiree.user_id == scope.user.id
+    true = soiree.host == scope.user.id
 
     with {:ok, soiree = %Soiree{}} <-
            Repo.delete(soiree) do
@@ -140,7 +140,7 @@ defmodule SoireePlateau.Teuf do
 
   """
   def change_soiree(%Scope{} = scope, %Soiree{} = soiree, attrs \\ %{}) do
-    true = soiree.user_id == scope.user.id
+    true = soiree.host == scope.user.id
 
     Soiree.changeset(soiree, attrs, scope)
   end
