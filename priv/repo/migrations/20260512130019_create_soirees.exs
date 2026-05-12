@@ -10,7 +10,6 @@ defmodule SoireePlateau.Repo.Migrations.CreateSoirees do
       add :host, references(:users, on_delete: :delete_all)
       add :game_id, references(:games, on_delete: :nothing)
 
-
       timestamps(type: :utc_datetime)
     end
 

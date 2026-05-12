@@ -75,8 +75,6 @@ defmodule SoireePlateauWeb.Router do
       live "/register", UserLive.Registration, :new
       live "/log-in", UserLive.Login, :new
       live "/log-in/:token", UserLive.Confirmation, :new
-
-
     end
 
     post "/log-in", UserSessionController, :create
