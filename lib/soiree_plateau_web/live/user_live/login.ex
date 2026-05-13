@@ -10,16 +10,16 @@ defmodule SoireePlateauWeb.UserLive.Login do
       <div class="mx-auto max-w-sm space-y-4">
         <div class="text-center">
           <.header>
-            <p>Log in</p>
+            <p>Se connecter</p>
             <:subtitle>
               <%= if @current_scope do %>
-                You need to reauthenticate to perform sensitive actions on your account.
+                Veuillez vous ré-authentifier pour effectuer des actions sensibles sur votre compte.
               <% else %>
-                Don't have an account? <.link
+                Vous n'avez pas de compte ? <.link
                   navigate={~p"/users/register"}
                   class="font-semibold text-brand hover:underline"
                   phx-no-format
-                >Sign up</.link> for an account now.
+                >S'inscrire</.link> dès maintenant.
               <% end %>
             </:subtitle>
           </.header>
@@ -28,9 +28,12 @@ defmodule SoireePlateauWeb.UserLive.Login do
         <div :if={local_mail_adapter?()} class="alert alert-info">
           <.icon name="hero-information-circle" class="size-6 shrink-0" />
           <div>
-            <p>You are running the local mail adapter.</p>
+            <p>Vous utilisez l'adaptateur de mail local.</p>
             <p>
-              To see sent emails, visit <.link href="/dev/mailbox" class="underline">the mailbox page</.link>.
+              Pour voir les e-mails envoyés, rendez-vous sur <.link
+                href="/dev/mailbox"
+                class="underline"
+              >la page de la boîte mail</.link>.
             </p>
           </div>
         </div>
@@ -46,18 +49,18 @@ defmodule SoireePlateauWeb.UserLive.Login do
             readonly={!!@current_scope}
             field={f[:email]}
             type="email"
-            label="Email"
+            label="Adresse e-mail"
             autocomplete="username"
             spellcheck="false"
             required
             phx-mounted={JS.focus()}
           />
           <.button class="btn btn-primary w-full">
-            Log in with email <span aria-hidden="true">→</span>
+            Se connecter par e-mail <span aria-hidden="true">→</span>
           </.button>
         </.form>
 
-        <div class="divider">or</div>
+        <div class="divider">ou</div>
 
         <.form
           :let={f}
@@ -71,7 +74,7 @@ defmodule SoireePlateauWeb.UserLive.Login do
             readonly={!!@current_scope}
             field={f[:email]}
             type="email"
-            label="Email"
+            label="Adresse e-mail"
             autocomplete="username"
             spellcheck="false"
             required
@@ -79,15 +82,15 @@ defmodule SoireePlateauWeb.UserLive.Login do
           <.input
             field={@form[:password]}
             type="password"
-            label="Password"
+            label="Mot de passe"
             autocomplete="current-password"
             spellcheck="false"
           />
           <.button class="btn btn-primary w-full" name={@form[:remember_me].name} value="true">
-            Log in and stay logged in <span aria-hidden="true">→</span>
+            Se connecter et rester connecté <span aria-hidden="true">→</span>
           </.button>
           <.button class="btn btn-primary btn-soft w-full mt-2">
-            Log in only this time
+            Se connecter uniquement cette fois
           </.button>
         </.form>
       </div>
@@ -120,7 +123,7 @@ defmodule SoireePlateauWeb.UserLive.Login do
     end
 
     info =
-      "If your email is in our system, you will receive instructions for logging in shortly."
+      "Si votre e-mail est présent dans notre système, vous recevrez bientôt les instructions pour vous connecter."
 
     {:noreply,
      socket

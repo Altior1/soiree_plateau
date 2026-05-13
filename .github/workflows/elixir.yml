@@ -43,7 +43,7 @@ jobs:
 
     - name: Install dependencies
       run: mix deps.get
-    - name: format
-      run: mix format
+    - name: Vérifie le format
+      run: mix format --check-formatted
     - name: Run tests
       run: mix test

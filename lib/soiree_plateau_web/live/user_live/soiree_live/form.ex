@@ -10,18 +10,20 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage soiree records in your database.</:subtitle>
+        <:subtitle>Utilisez ce formulaire pour gérer les soirées dans la base de données.</:subtitle>
       </.header>
 
       <.form for={@form} id="soiree-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:title]} type="text" label="Title" />
+        <.input field={@form[:title]} type="text" label="Titre" />
         <.input field={@form[:date]} type="datetime-local" label="Date" />
-        <.input field={@form[:home]} type="text" label="Home" />
-        <.input field={@form[:capacity]} type="number" label="Capacity" />
-        <.input field={@form[:game_id]} type="select" label="Game" options={@options_games} />
+        <.input field={@form[:home]} type="text" label="Lieu" />
+        <.input field={@form[:capacity]} type="number" label="Capacité" />
+        <.input field={@form[:game_id]} type="select" label="Jeu" options={@options_games} />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Soiree</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @soiree)}>Cancel</.button>
+          <.button phx-disable-with="Enregistrement..." variant="primary">
+            Enregistrer la soirée
+          </.button>
+          <.button navigate={return_path(@current_scope, @return_to, @soiree)}>Annuler</.button>
         </footer>
       </.form>
     </Layouts.app>
@@ -46,7 +48,7 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
     soiree = Teuf.get_soiree!(socket.assigns.current_scope, id)
 
     socket
-    |> assign(:page_title, "Edit Soiree")
+    |> assign(:page_title, "Modifier la soirée")
     |> assign(:soiree, soiree)
     |> assign(:form, to_form(Teuf.change_soiree(socket.assigns.current_scope, soiree)))
   end
@@ -55,7 +57,7 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
     soiree = %Soiree{host: socket.assigns.current_scope.user.id}
 
     socket
-    |> assign(:page_title, "New Soiree")
+    |> assign(:page_title, "Nouvelle soirée")
     |> assign(:soiree, soiree)
     |> assign(:form, to_form(Teuf.change_soiree(socket.assigns.current_scope, soiree)))
   end
@@ -93,7 +95,7 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
       {:ok, soiree} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Soiree updated successfully")
+         |> put_flash(:info, "Soirée mise à jour avec succès")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, soiree)
          )}
@@ -108,7 +110,7 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
       {:ok, soiree} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Soiree created successfully")
+         |> put_flash(:info, "Soirée créée avec succès")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, soiree)
          )}

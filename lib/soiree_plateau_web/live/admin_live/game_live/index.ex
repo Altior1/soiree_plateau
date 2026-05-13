@@ -8,10 +8,10 @@ defmodule SoireePlateauWeb.GameLive.Index do
     ~H"""
     <Layouts.app flash={@flash}>
       <.header>
-        Listing Games
+        Liste des jeux
         <:actions>
           <.button variant="primary" navigate={~p"/admin/games/new"}>
-            <.icon name="hero-plus" /> New Game
+            <.icon name="hero-plus" /> Nouveau jeu
           </.button>
         </:actions>
       </.header>
@@ -21,20 +21,20 @@ defmodule SoireePlateauWeb.GameLive.Index do
         rows={@streams.games}
         row_click={fn {_id, game} -> JS.navigate(~p"/admin/games/#{game}") end}
       >
-        <:col :let={{_id, game}} label="Name">{game.name}</:col>
+        <:col :let={{_id, game}} label="Nom">{game.name}</:col>
         <:col :let={{_id, game}} label="Description">{game.description}</:col>
         <:action :let={{_id, game}}>
           <div class="sr-only">
-            <.link navigate={~p"/admin/games/#{game}"}>Show</.link>
+            <.link navigate={~p"/admin/games/#{game}"}>Voir</.link>
           </div>
-          <.link navigate={~p"/admin/games/#{game}/edit"}>Edit</.link>
+          <.link navigate={~p"/admin/games/#{game}/edit"}>Modifier</.link>
         </:action>
         <:action :let={{id, game}}>
           <.link
             phx-click={JS.push("delete", value: %{id: game.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="Confirmer la suppression ?"
           >
-            Delete
+            Supprimer
           </.link>
         </:action>
       </.table>
@@ -46,7 +46,7 @@ defmodule SoireePlateauWeb.GameLive.Index do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:page_title, "Listing Games")
+     |> assign(:page_title, "Liste des jeux")
      |> stream(:games, list_games())}
   end
 
