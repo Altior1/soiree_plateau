@@ -11,8 +11,8 @@ defmodule SoireePlateauWeb.UserLive.Settings do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="text-center">
         <.header>
-          Account Settings
-          <:subtitle>Manage your account email address and password settings</:subtitle>
+          Paramètres du compte
+          <:subtitle>Gérez l'adresse e-mail et le mot de passe de votre compte</:subtitle>
         </.header>
       </div>
 
@@ -20,12 +20,12 @@ defmodule SoireePlateauWeb.UserLive.Settings do
         <.input
           field={@email_form[:email]}
           type="email"
-          label="Email"
+          label="Adresse e-mail"
           autocomplete="username"
           spellcheck="false"
           required
         />
-        <.button variant="primary" phx-disable-with="Changing...">Change Email</.button>
+        <.button variant="primary" phx-disable-with="Enregistrement...">Modifier l'adresse e-mail</.button>
       </.form>
 
       <div class="divider" />
@@ -49,7 +49,7 @@ defmodule SoireePlateauWeb.UserLive.Settings do
         <.input
           field={@password_form[:password]}
           type="password"
-          label="New password"
+          label="Nouveau mot de passe"
           autocomplete="new-password"
           spellcheck="false"
           required
@@ -57,12 +57,12 @@ defmodule SoireePlateauWeb.UserLive.Settings do
         <.input
           field={@password_form[:password_confirmation]}
           type="password"
-          label="Confirm new password"
+          label="Confirmer le nouveau mot de passe"
           autocomplete="new-password"
           spellcheck="false"
         />
-        <.button variant="primary" phx-disable-with="Saving...">
-          Save Password
+        <.button variant="primary" phx-disable-with="Enregistrement...">
+          Enregistrer le mot de passe
         </.button>
       </.form>
     </Layouts.app>
@@ -74,13 +74,13 @@ defmodule SoireePlateauWeb.UserLive.Settings do
     socket =
       case Accounts.update_user_email(socket.assigns.current_scope.user, token) do
         {:ok, _user} ->
-          put_flash(socket, :info, "Email changed successfully.")
+          put_flash(socket, :info, "E-mail modifié avec succès.")
 
         {:error, _} ->
-          put_flash(socket, :error, "Email change link is invalid or it has expired.")
+          put_flash(socket, :error, "Le lien de changement d'e-mail est invalide ou a expiré.")
       end
 
-    {:ok, push_navigate(socket, to: ~p"/users/settings")}
+        {:ok, push_navigate(socket, to: ~p"/users/settings")}
   end
 
   def mount(_params, _session, socket) do
@@ -124,7 +124,7 @@ defmodule SoireePlateauWeb.UserLive.Settings do
           &url(~p"/users/settings/confirm-email/#{&1}")
         )
 
-        info = "A link to confirm your email change has been sent to the new address."
+        info = "Un lien de confirmation a été envoyé à la nouvelle adresse."
         {:noreply, socket |> put_flash(:info, info)}
 
       changeset ->

@@ -11,13 +11,13 @@ defmodule SoireePlateauWeb.UserLive.Registration do
       <div class="mx-auto max-w-sm">
         <div class="text-center">
           <.header>
-            Register for an account
+            S'inscrire
             <:subtitle>
-              Already registered?
+              Déjà inscrit ?
               <.link navigate={~p"/users/log-in"} class="font-semibold text-brand hover:underline">
-                Log in
+                Se connecter
               </.link>
-              to your account now.
+              pour accéder à votre compte.
             </:subtitle>
           </.header>
         </div>
@@ -26,7 +26,7 @@ defmodule SoireePlateauWeb.UserLive.Registration do
           <.input
             field={@form[:email]}
             type="email"
-            label="Email"
+            label="Adresse e-mail"
             autocomplete="username"
             spellcheck="false"
             required
@@ -36,7 +36,7 @@ defmodule SoireePlateauWeb.UserLive.Registration do
           <.input
             field={@form[:password]}
             type="password"
-            label="Password"
+            label="Mot de passe"
             autocomplete="new-password"
             required
           />
@@ -44,13 +44,13 @@ defmodule SoireePlateauWeb.UserLive.Registration do
           <.input
             field={@form[:password_confirmation]}
             type="password"
-            label="Confirm new password"
+            label="Confirmer le mot de passe"
             autocomplete="new-password"
             spellcheck="false"
           />
 
-          <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
-            Create an account
+          <.button phx-disable-with="Création du compte..." class="btn btn-primary w-full">
+            S'inscrire
           </.button>
         </.form>
       </div>
@@ -84,7 +84,7 @@ defmodule SoireePlateauWeb.UserLive.Registration do
          socket
          |> put_flash(
            :info,
-           "An email was sent to #{user.email}, please access it to confirm your account."
+           "Un e-mail a été envoyé à #{user.email}, veuillez y accéder pour confirmer votre compte."
          )
          |> push_navigate(to: ~p"/users/log-in")}
 

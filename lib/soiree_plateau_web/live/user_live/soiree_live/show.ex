@@ -8,23 +8,23 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Soiree {@soiree.id}
-        <:subtitle>This is a soiree record from your database.</:subtitle>
+        Soirée #{@soiree.id}
+        <:subtitle>Fiche de la soirée depuis la base de données.</:subtitle>
         <:actions>
           <.button navigate={~p"/users/soirees"}>
             <.icon name="hero-arrow-left" />
           </.button>
           <.button variant="primary" navigate={~p"/users/soirees/#{@soiree}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit soiree
+            <.icon name="hero-pencil-square" /> Modifier la soirée
           </.button>
         </:actions>
       </.header>
 
       <.list>
-        <:item title="Title">{@soiree.title}</:item>
+        <:item title="Titre">{@soiree.title}</:item>
         <:item title="Date">{@soiree.date}</:item>
-        <:item title="Home">{@soiree.home}</:item>
-        <:item title="Capacity">{@soiree.capacity}</:item>
+        <:item title="Lieu">{@soiree.home}</:item>
+        <:item title="Capacité">{@soiree.capacity}</:item>
       </.list>
     </Layouts.app>
     """
@@ -38,7 +38,7 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Soiree")
+     |> assign(:page_title, "Détails de la soirée")
      |> assign(:soiree, Teuf.get_soiree!(socket.assigns.current_scope, id))}
   end
 
@@ -55,8 +55,8 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
         %{assigns: %{soiree: %{id: id}}} = socket
       ) do
     {:noreply,
-     socket
-     |> put_flash(:error, "The current soiree was deleted.")
+    socket
+    |> put_flash(:error, "La soirée a été supprimée.")
      |> push_navigate(to: ~p"/users/soirees")}
   end
 

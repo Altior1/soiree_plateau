@@ -46,9 +46,9 @@ defmodule SoireePlateau.Accounts.User do
       changeset
       |> validate_required([:email])
       |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/,
-        message: "must have the @ sign and no spaces"
+        message: "doit contenir le caractère @ et ne doit pas contenir d'espaces"
       )
-      |> validate_length(:email, max: 160)
+      |> validate_length(:email, max: 160, message: "doit contenir au maximum %{count} caractères")
 
     if Keyword.get(opts, :validate_unique, true) do
       changeset
@@ -62,7 +62,7 @@ defmodule SoireePlateau.Accounts.User do
 
   defp validate_email_changed(changeset) do
     if get_field(changeset, :email) && get_change(changeset, :email) == nil do
-      add_error(changeset, :email, "did not change")
+      add_error(changeset, :email, "n'a pas changé")
     else
       changeset
     end
@@ -86,14 +86,15 @@ defmodule SoireePlateau.Accounts.User do
   def password_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:password])
-    |> validate_confirmation(:password, message: "does not match password")
+    |> validate_confirmation(:password, message: "ne correspond pas au mot de passe")
     |> validate_password(opts)
   end
 
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])
-    |> validate_length(:password, min: 12, max: 72)
+    |> validate_length(:password, min: 12, message: "doit contenir au moins %{count} caractères")
+    |> validate_length(:password, max: 72, message: "doit contenir au maximum %{count} caractères")
     # Examples of additional password validation:
     # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
     # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")

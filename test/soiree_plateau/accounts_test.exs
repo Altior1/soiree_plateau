@@ -58,13 +58,13 @@ defmodule SoireePlateau.AccountsTest do
     test "validates email when given" do
       {:error, changeset} = Accounts.register_user(%{email: "not valid"})
 
-      assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
+      assert %{email: ["doit contenir le caractère @ et ne doit pas contenir d'espaces"]} = errors_on(changeset)
     end
 
     test "validates maximum values for email for security" do
       too_long = String.duplicate("db", 100)
       {:error, changeset} = Accounts.register_user(%{email: too_long})
-      assert "should be at most 160 character(s)" in errors_on(changeset).email
+      assert "doit contenir au maximum 160 caractères" in errors_on(changeset).email
     end
 
     test "validates email uniqueness" do
@@ -215,8 +215,8 @@ defmodule SoireePlateau.AccountsTest do
         })
 
       assert %{
-               password: ["should be at least 12 character(s)"],
-               password_confirmation: ["does not match password"]
+               password: ["doit contenir au moins 12 caractères"],
+               password_confirmation: ["ne correspond pas au mot de passe"]
              } = errors_on(changeset)
     end
 
@@ -226,7 +226,7 @@ defmodule SoireePlateau.AccountsTest do
       {:error, changeset} =
         Accounts.update_user_password(user, %{password: too_long})
 
-      assert "should be at most 72 character(s)" in errors_on(changeset).password
+      assert "doit contenir au maximum 72 caractères" in errors_on(changeset).password
     end
 
     test "updates the password", %{user: user} do

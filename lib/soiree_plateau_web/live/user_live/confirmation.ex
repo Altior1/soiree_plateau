@@ -9,7 +9,7 @@ defmodule SoireePlateauWeb.UserLive.Confirmation do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="mx-auto max-w-sm">
         <div class="text-center">
-          <.header>Welcome {@user.email}</.header>
+          <.header>Bienvenue {@user.email}</.header>
         </div>
 
         <.form
@@ -25,13 +25,13 @@ defmodule SoireePlateauWeb.UserLive.Confirmation do
           <.button
             name={@form[:remember_me].name}
             value="true"
-            phx-disable-with="Confirming..."
+            phx-disable-with="Confirmation..."
             class="btn btn-primary w-full"
           >
-            Confirm and stay logged in
+            Confirmer et rester connecté
           </.button>
-          <.button phx-disable-with="Confirming..." class="btn btn-primary btn-soft w-full mt-2">
-            Confirm and log in only this time
+          <.button phx-disable-with="Confirmation..." class="btn btn-primary btn-soft w-full mt-2">
+            Confirmer et se connecter uniquement cette fois
           </.button>
         </.form>
 
@@ -46,26 +46,26 @@ defmodule SoireePlateauWeb.UserLive.Confirmation do
         >
           <input type="hidden" name={@form[:token].name} value={@form[:token].value} />
           <%= if @current_scope do %>
-            <.button phx-disable-with="Logging in..." class="btn btn-primary w-full">
-              Log in
+            <.button phx-disable-with="Connexion..." class="btn btn-primary w-full">
+              Se connecter
             </.button>
           <% else %>
             <.button
               name={@form[:remember_me].name}
               value="true"
-              phx-disable-with="Logging in..."
+              phx-disable-with="Connexion..."
               class="btn btn-primary w-full"
             >
-              Keep me logged in on this device
+              Rester connecté sur cet appareil
             </.button>
-            <.button phx-disable-with="Logging in..." class="btn btn-primary btn-soft w-full mt-2">
-              Log me in only this time
+            <.button phx-disable-with="Connexion..." class="btn btn-primary btn-soft w-full mt-2">
+              Se connecter uniquement cette fois
             </.button>
           <% end %>
         </.form>
 
         <p :if={!@user.confirmed_at} class="alert alert-outline mt-8">
-          Tip: If you prefer passwords, you can enable them in the user settings.
+          Astuce : si vous préférez les mots de passe, vous pouvez les activer dans les paramètres utilisateur.
         </p>
       </div>
     </Layouts.app>
@@ -82,7 +82,7 @@ defmodule SoireePlateauWeb.UserLive.Confirmation do
     else
       {:ok,
        socket
-       |> put_flash(:error, "Magic link is invalid or it has expired.")
+       |> put_flash(:error, "Le lien magique est invalide ou a expiré.")
        |> push_navigate(to: ~p"/users/log-in")}
     end
   end
