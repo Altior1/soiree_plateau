@@ -19,6 +19,17 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
         <.input field={@form[:home]} type="text" label="Lieu" />
         <.input field={@form[:capacity]} type="number" label="Capacité" />
         <.input field={@form[:game_id]} type="select" label="Jeu" options={@options_games} />
+
+        <.input
+          id="soiree_invitee_ids"
+          name="soiree[invitee_ids][]"
+          type="select"
+          label="Inviter des utilisateurs"
+          multiple={true}
+          options={@options_invitees}
+          value={@selected_invitee_ids}
+        />
+
         <footer>
           <.button phx-disable-with="Enregistrement..." variant="primary">
             Enregistrer la soirée
@@ -33,11 +44,13 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
   @impl true
   def mount(params, _session, socket) do
     options_games = SoireePlateau.Games.list_games_for_form()
+    options_invitees = Teuf.list_users_for_invitation(socket.assigns.current_scope)
 
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
      |> assign(:options_games, options_games)
+     |> assign(:options_invitees, options_invitees)
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -46,10 +59,12 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     soiree = Teuf.get_soiree!(socket.assigns.current_scope, id)
+    selected = Teuf.list_invitee_ids(soiree)
 
     socket
     |> assign(:page_title, "Modifier la soirée")
     |> assign(:soiree, soiree)
+    |> assign(:selected_invitee_ids, selected)
     |> assign(:form, to_form(Teuf.change_soiree(socket.assigns.current_scope, soiree)))
   end
 
@@ -59,6 +74,7 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
     socket
     |> assign(:page_title, "Nouvelle soirée")
     |> assign(:soiree, soiree)
+    |> assign(:selected_invitee_ids, [])
     |> assign(:form, to_form(Teuf.change_soiree(socket.assigns.current_scope, soiree)))
   end
 
@@ -67,7 +83,10 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
     changeset =
       Teuf.change_soiree(socket.assigns.current_scope, socket.assigns.soiree, soiree_params)
 
-    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+    {:noreply,
+     socket
+     |> assign(:selected_invitee_ids, normalize_invitee_ids(soiree_params["invitee_ids"]))
+     |> assign(form: to_form(changeset, action: :validate))}
   end
 
   def handle_event("save", %{"soiree" => soiree_params}, socket) do
@@ -118,6 +137,27 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
+  end
+
+  defp normalize_invitee_ids(nil), do: []
+
+  defp normalize_invitee_ids(ids) when is_list(ids) do
+    Enum.flat_map(ids, fn
+      "" ->
+        []
+
+      id when is_binary(id) ->
+        case Integer.parse(id) do
+          {int, _} -> [int]
+          :error -> []
+        end
+
+      id when is_integer(id) ->
+        [id]
+
+      _ ->
+        []
+    end)
   end
 
   defp return_path(_scope, "index", _soiree), do: ~p"/users/soirees"
