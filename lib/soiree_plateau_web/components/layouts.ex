@@ -42,6 +42,13 @@ defmodule SoireePlateauWeb.Layouts do
           <nav class="hidden md:flex gap-4 text-sm text-gray-700">
             <.link navigate={~p"/"} class="hover:underline">Accueil</.link>
             <.link navigate={~p"/users/soirees"} class="hover:underline">Soirées</.link>
+            <.link
+              :if={@current_scope}
+              navigate={~p"/users/invitations"}
+              class="hover:underline"
+            >
+              Mes invitations
+            </.link>
             <.link navigate={~p"/users/games"} class="hover:underline">Jeux</.link>
           </nav>
         </div>

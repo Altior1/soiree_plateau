@@ -62,6 +62,8 @@ defmodule SoireePlateauWeb.Router do
       live "/soirees/new", SoireeLive.Form, :new
       live "/soirees/:id", SoireeLive.Show, :show
       live "/soirees/:id/edit", SoireeLive.Form, :edit
+
+      live "/invitations", InvitationLive.Index, :index
     end
 
     post "/update-password", UserSessionController, :update_password
