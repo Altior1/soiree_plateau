@@ -1,6 +1,8 @@
 defmodule SoireePlateauWeb.UserLive.Home do
   use SoireePlateauWeb, :live_view
 
+  alias SoireePlateau.Teuf.Soiree
+  alias SoireePlateauWeb.Components.SoireeComponents
   def mount(_params, _session, socket) do
     {:ok, socket}
   end
@@ -36,11 +38,14 @@ defmodule SoireePlateauWeb.UserLive.Home do
           <div class="hidden lg:block lg:flex-1">
             <div class="ml-10 w-full max-w-md rounded-lg bg-white/60 p-8 shadow-lg dark:bg-gray-800/60">
               <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Événement à la une</h3>
-              <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                Soirée «Mystères & stratégies» — places limitées.
-              </p>
+              <SoireeComponents.soiree_card soiree={%Soiree{
+                title: "Soirée Jeux de Rôle",
+                date: "Samedi 15 juin 2024",
+                home: "Chez Alice",
+                capacity: 10
+              }} />
               <div class="mt-4">
-                <.link href={~p"/soirees"} class="text-sm font-medium text-blue-600 hover:underline">
+                <.link href={~p"/users/soirees"} class="text-sm font-medium text-blue-600 hover:underline">
                   Voir les soirées
                 </.link>
               </div>

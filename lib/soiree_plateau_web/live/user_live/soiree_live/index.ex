@@ -8,7 +8,7 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Soirees
+        Liste des soirées
         <:actions>
           <.button variant="primary" navigate={~p"/users/soirees/new"}>
             <.icon name="hero-plus" /> New Soiree
