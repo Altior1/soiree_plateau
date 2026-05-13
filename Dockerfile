@@ -17,12 +17,16 @@ RUN mix deps.get
 # Compile the application
 RUN MIX_ENV=prod mix compile
 
-RUN mix ecto.setup
-
-RUN mix run priv/repo/seeds.exs
+# Database setup will run at container startup via the entrypoint script
+# (avoid running stateful DB commands during image build)
 
 # Expose the application port
 EXPOSE 4000
 
-# Start the application
+# Copy and install the container entrypoint that runs migrations/seeds at startup
+COPY entrypoint.sh .
+RUN chmod +x ./entrypoint.sh
+
+# Start the application (entrypoint will run migrations/seeds before exec)
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["mix", "phx.server"]

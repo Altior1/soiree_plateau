@@ -33,11 +33,10 @@ defmodule SoireePlateau.TeufFixtures do
   """
   def invitation_fixture(soiree, user, attrs \\ %{}) do
     attrs =
-      Enum.into(attrs, %{
-        soiree_id: soiree.id,
-        user_id: user.id,
-        status: :pending
-      })
+      attrs
+      |> Enum.into(%{status: :pending})
+      |> Map.put(:soiree_id, soiree.id)
+      |> Map.put(:user_id, user.id)
 
     %Invitation{}
     |> Invitation.changeset(attrs)

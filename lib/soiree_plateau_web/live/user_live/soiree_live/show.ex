@@ -114,15 +114,19 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
         {:noreply, put_flash(socket, :error, "L'hôte ne peut pas être retiré.")}
 
       true ->
-        {:ok, _} = Teuf.remove_invitation(socket.assigns.current_scope, invitation)
+        case Teuf.remove_invitation(socket.assigns.current_scope, invitation) do
+          {:ok, _} ->
+            {:noreply,
+             socket
+             |> put_flash(:info, "Invité retiré.")
+             |> assign(
+               :invitations,
+               Teuf.list_invitations_for_soiree(socket.assigns.current_scope, soiree)
+             )}
 
-        {:noreply,
-         socket
-         |> put_flash(:info, "Invité retiré.")
-         |> assign(
-           :invitations,
-           Teuf.list_invitations_for_soiree(socket.assigns.current_scope, soiree)
-         )}
+          {:error, _reason} ->
+            {:noreply, put_flash(socket, :error, "Impossible de retirer l'invité.")}
+        end
     end
   end
 

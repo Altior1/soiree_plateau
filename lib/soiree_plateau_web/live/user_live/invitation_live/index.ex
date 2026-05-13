@@ -98,17 +98,28 @@ defmodule SoireePlateauWeb.InvitationLive.Index do
   @impl true
   def handle_event("respond", %{"id" => id, "status" => status}, socket) do
     invitation = Teuf.get_user_invitation!(socket.assigns.current_scope, id)
-    status_atom = String.to_existing_atom(status)
+    status_atom =
+      case status do
+        "pending" -> :pending
+        "yes" -> :yes
+        "no" -> :no
+        "maybe" -> :maybe
+        _ -> nil
+      end
 
-    case Teuf.respond_to_invitation(socket.assigns.current_scope, invitation, status_atom) do
-      {:ok, _} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Réponse enregistrée.")
-         |> assign(:invitations, Teuf.list_invitations_for_user(socket.assigns.current_scope))}
+    if status_atom == nil do
+      {:noreply, put_flash(socket, :error, "Statut invalide.")}
+    else
+      case Teuf.respond_to_invitation(socket.assigns.current_scope, invitation, status_atom) do
+        {:ok, _} ->
+          {:noreply,
+           socket
+           |> put_flash(:info, "Réponse enregistrée.")
+           |> assign(:invitations, Teuf.list_invitations_for_user(socket.assigns.current_scope))}
 
-      {:error, %Ecto.Changeset{}} ->
-        {:noreply, put_flash(socket, :error, "Impossible d'enregistrer la réponse.")}
+        {:error, %Ecto.Changeset{}} ->
+          {:noreply, put_flash(socket, :error, "Impossible d'enregistrer la réponse.")}
+      end
     end
   end
 

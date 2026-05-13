@@ -67,19 +67,33 @@ defmodule SoireePlateau.Teuf do
   end
 
   defp broadcast_invitation_to_soiree(soiree_id, message) do
-    Phoenix.PubSub.broadcast(
-      SoireePlateau.PubSub,
-      "soiree:#{soiree_id}:invitations",
-      message
-    )
+    case Phoenix.PubSub.broadcast(
+           SoireePlateau.PubSub,
+           "soiree:#{soiree_id}:invitations",
+           message
+         ) do
+      :ok ->
+        :ok
+
+      {:error, reason} ->
+        Logger.warning("Failed to broadcast invitation to soiree: #{inspect(reason)}")
+        {:error, reason}
+    end
   end
 
   defp broadcast_invitation_to_user(user_id, message) do
-    Phoenix.PubSub.broadcast(
-      SoireePlateau.PubSub,
-      "user:#{user_id}:invitations",
-      message
-    )
+    case Phoenix.PubSub.broadcast(
+           SoireePlateau.PubSub,
+           "user:#{user_id}:invitations",
+           message
+         ) do
+      :ok ->
+        :ok
+
+      {:error, reason} ->
+        Logger.warning("Failed to broadcast invitation to user: #{inspect(reason)}")
+        {:error, reason}
+    end
   end
 
   @doc """
@@ -131,10 +145,11 @@ defmodule SoireePlateau.Teuf do
            |> Soiree.changeset(attrs, scope)
            |> Repo.insert() do
       # The host is always an invitee with status :yes
-      ensure_host_invitation(soiree)
-      sync_invitees(scope, soiree, extract_invitee_ids(attrs))
-      broadcast_soiree(scope, {:created, soiree})
-      {:ok, soiree}
+      with {:ok, _inv} <- ensure_host_invitation(soiree) do
+        sync_invitees(scope, soiree, extract_invitee_ids(attrs))
+        broadcast_soiree(scope, {:created, soiree})
+        {:ok, soiree}
+      end
     end
   end
 
@@ -157,10 +172,11 @@ defmodule SoireePlateau.Teuf do
            soiree
            |> Soiree.changeset(attrs, scope)
            |> Repo.update() do
-      ensure_host_invitation(soiree)
-      sync_invitees(scope, soiree, extract_invitee_ids(attrs))
-      broadcast_soiree(scope, {:updated, soiree})
-      {:ok, soiree}
+      with {:ok, _inv} <- ensure_host_invitation(soiree) do
+        sync_invitees(scope, soiree, extract_invitee_ids(attrs))
+        broadcast_soiree(scope, {:updated, soiree})
+        {:ok, soiree}
+      end
     end
   end
 
@@ -327,10 +343,10 @@ defmodule SoireePlateau.Teuf do
           user_id: soiree.host,
           status: :yes
         })
-        |> Repo.insert!()
+        |> Repo.insert()
 
       %Invitation{} = inv ->
-        inv
+        {:ok, inv}
     end
   end
 
@@ -351,7 +367,15 @@ defmodule SoireePlateau.Teuf do
            |> Repo.insert() do
         {:ok, inv} ->
           inv = Repo.preload(inv, [:user, soiree: [:user, :game]])
-          broadcast_invitation_to_user(user_id, {:invitation_created, inv})
+          %Invitation{} = inv ->
+            case Repo.delete(inv) do
+              {:ok, deleted} ->
+                broadcast_invitation_to_user(user_id, {:invitation_deleted, deleted})
+                broadcast_invitation_to_soiree(soiree.id, {:invitation_deleted, deleted})
+
+              {:error, _changeset} ->
+                :noop
+            end
           broadcast_invitation_to_soiree(soiree.id, {:invitation_created, inv})
 
         {:error, _} ->
