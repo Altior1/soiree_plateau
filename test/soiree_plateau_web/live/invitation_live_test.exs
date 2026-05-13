@@ -62,5 +62,27 @@ defmodule SoireePlateauWeb.InvitationLiveTest do
       {:ok, _live, html} = live(other_conn, ~p"/users/invitations")
       assert html =~ "Aucune invitation"
     end
+
+    test "live-updates when a new invitation is created from another scope" do
+      user = user_fixture()
+      conn = log_in_user(Phoenix.ConnTest.build_conn(), user)
+
+      {:ok, live, html} = live(conn, ~p"/users/invitations")
+      assert html =~ "Aucune invitation"
+
+      other_host = user_fixture()
+      other_host_scope = SoireePlateau.Accounts.Scope.for_user(other_host)
+
+      {:ok, _soiree} =
+        Teuf.create_soiree(other_host_scope, %{
+          title: "Surprise party",
+          date: ~N[2026-07-01 20:00:00],
+          home: "ailleurs",
+          capacity: 5,
+          invitee_ids: [user.id]
+        })
+
+      assert render(live) =~ "Surprise party"
+    end
   end
 end
