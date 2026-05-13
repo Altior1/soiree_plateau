@@ -4,6 +4,9 @@ defmodule SoireePlateau.TeufFixtures do
   entities via the `SoireePlateau.Teuf` context.
   """
 
+  alias SoireePlateau.Repo
+  alias SoireePlateau.Teuf.Invitation
+
   @doc """
   Generate a soiree.
   """
@@ -23,5 +26,21 @@ defmodule SoireePlateau.TeufFixtures do
       {:error, changeset} ->
         raise "Failed to create soiree fixture: #{inspect(changeset.errors)}"
     end
+  end
+
+  @doc """
+  Generate an invitation for the given soiree + user.
+  """
+  def invitation_fixture(soiree, user, attrs \\ %{}) do
+    attrs =
+      Enum.into(attrs, %{
+        soiree_id: soiree.id,
+        user_id: user.id,
+        status: :pending
+      })
+
+    %Invitation{}
+    |> Invitation.changeset(attrs)
+    |> Repo.insert!()
   end
 end
