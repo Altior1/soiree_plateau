@@ -138,6 +138,7 @@ IO.puts("✓ #{length(games)} jeux insérés")
 
 alice_scope = Accounts.Scope.for_user(alice)
 bob_scope = Accounts.Scope.for_user(bob)
+chloe_scope = Accounts.Scope.for_user(chloe)
 
 [catan, carcassonne, codenames, _dixit, _seven_wonders, _terra] = games
 
@@ -177,6 +178,32 @@ _soiree_3 =
     game_id: carcassonne.id,
     invitee_ids: [alice.id, chloe.id]
   })
+
+# Soirée antérieure (passée) : permet de vérifier l'affichage des votes
+soiree_past =
+  create_soiree.(chloe_scope, %{
+    title: "Soirée rétro (passée)",
+    date: ~N[2026-04-10 20:00:00],
+    home: "Chez Chloé",
+    capacity: 6,
+    game_id: carcassonne.id,
+    invitee_ids: [alice.id, bob.id, david.id]
+  })
+
+# Quelques RSVPs pour la soirée passée
+set_status.(soiree_past, alice, :yes)
+set_status.(soiree_past, bob, :yes)
+set_status.(soiree_past, david, :no)
+
+# Insérer quelques votes d'exemple pour la soirée passée (table :votes)
+now = DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_naive()
+votes = [
+  %{rating: 5, user_id: alice.id, soiree_id: soiree_past.id, game_id: carcassonne.id, inserted_at: now, updated_at: now},
+  %{rating: 4, user_id: bob.id, soiree_id: soiree_past.id, game_id: carcassonne.id, inserted_at: now, updated_at: now},
+  %{rating: 2, user_id: david.id, soiree_id: soiree_past.id, game_id: carcassonne.id, inserted_at: now, updated_at: now}
+]
+
+Repo.insert_all(:votes, votes)
 
 # -- Quelques réponses RSVP préfaites pour rendre la vue intéressante --------
 
