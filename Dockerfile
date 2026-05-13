@@ -17,6 +17,10 @@ RUN mix deps.get
 # Compile the application
 RUN MIX_ENV=prod mix compile
 
+RUN mix ecto.setup
+
+RUN mix run priv/repo/seeds.exs
+
 # Expose the application port
 EXPOSE 4000
 
