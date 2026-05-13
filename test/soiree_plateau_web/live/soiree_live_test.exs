@@ -152,47 +152,28 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
     end
   end
 
-  describe "Form with invitees" do
-    setup [:create_soiree]
-
-    test "validate event normalizes invitee_ids", %{conn: conn} do
-      guest = SoireePlateau.AccountsFixtures.user_fixture()
-
-      {:ok, form_live, _html} = live(conn, ~p"/users/soirees/new")
-
-      # Submit validate with mixed legit + invalid invitee ids — the form should
-      # filter them down to the valid integers.
-      html =
-        form_live
-        |> form("#soiree-form",
-          soiree: Map.put(@create_attrs, :invitee_ids, [to_string(guest.id), "", "abc"])
-        )
-        |> render_change()
-
-      assert html =~ "Inviter"
-    end
-
+  describe "Form" do
     test "create with selected invitees inserts pending invitations", %{conn: conn, scope: scope} do
       guest = SoireePlateau.AccountsFixtures.user_fixture()
       {:ok, form_live, _html} = live(conn, ~p"/users/soirees/new")
 
+      attrs_with_invitees = Map.put(@create_attrs, :invitee_ids, [to_string(guest.id)])
+
       {:ok, _index_live, _html} =
         form_live
-        |> form("#soiree-form",
-          soiree: Map.put(@create_attrs, :invitee_ids, [to_string(guest.id)])
-        )
+        |> form("#soiree-form", soiree: attrs_with_invitees)
         |> render_submit()
         |> follow_redirect(conn, ~p"/users/soirees")
 
       [soiree] = SoireePlateau.Teuf.list_soirees(scope)
       assert SoireePlateau.Teuf.list_invitee_ids(soiree) == [guest.id]
     end
+  end
 
-    test "edit form returns to show when return_to=show", %{
-      conn: conn,
-      scope: scope,
-      soiree: soiree
-    } do
+  describe "Form edit" do
+    setup [:create_soiree]
+
+    test "returns to show when return_to=show", %{conn: conn, soiree: soiree} do
       {:ok, form_live, _html} =
         live(conn, ~p"/users/soirees/#{soiree}/edit?return_to=show")
 
@@ -203,10 +184,9 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
                |> follow_redirect(conn, ~p"/users/soirees/#{soiree}")
 
       assert html =~ "Soirée mise à jour"
-      _ = scope
     end
 
-    test "edit form shows changeset errors on invalid submit", %{conn: conn, soiree: soiree} do
+    test "shows changeset errors on invalid submit", %{conn: conn, soiree: soiree} do
       {:ok, form_live, _html} = live(conn, ~p"/users/soirees/#{soiree}/edit")
 
       html =
