@@ -75,6 +75,12 @@ defmodule SoireePlateauWeb.InvitationLive.Index do
               >
                 Non
               </button>
+              <.link
+                navigate={~p"/users/soirees/#{inv.soiree.id}"}
+                class="ml-auto self-center text-sm hover:underline"
+              >
+                Voir la soirée →
+              </.link>
             </footer>
           </article>
         <% end %>
