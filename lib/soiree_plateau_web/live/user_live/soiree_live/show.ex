@@ -118,7 +118,8 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
           </p>
         <% else %>
           <p class="text-sm mb-3">
-            Moyenne : <strong>{format_average(@vote_average)}</strong> / 5 ({@votes |> length()} note{plural(@votes)})
+            Moyenne : <strong>{format_average(@vote_average)}</strong>
+            / 5 ({@votes |> length()} note{plural(@votes)})
           </p>
           <ul id="votes" class="space-y-1 text-sm">
             <li :for={v <- @votes} id={"vote-#{v.id}"} class="flex justify-between border-b py-1">
@@ -142,7 +143,10 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
       |> Repo.preload([:game, :user])
 
     is_host = soiree.host == scope.user.id
-    can_vote = not is_host and Teuf.confirmed_invitee?(scope, soiree) and Teuf.soiree_past?(soiree)
+
+    can_vote =
+      not is_host and Teuf.confirmed_invitee?(scope, soiree) and Teuf.soiree_past?(soiree)
+
     soiree_past = Teuf.soiree_past?(soiree)
 
     if connected?(socket) do
@@ -222,8 +226,7 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
         {:noreply, put_flash(socket, :error, "Tu n'es pas invité à cette soirée.")}
 
       {:error, :soiree_not_finished} ->
-        {:noreply,
-         put_flash(socket, :error, "Le vote sera ouvert une fois la soirée terminée.")}
+        {:noreply, put_flash(socket, :error, "Le vote sera ouvert une fois la soirée terminée.")}
 
       {:error, :invalid_game} ->
         {:noreply, put_flash(socket, :error, "Ce jeu n'est pas associé à la soirée.")}
@@ -271,7 +274,12 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
 
   def handle_info({:vote_cast, %SoireePlateau.Teuf.Vote{}}, socket) do
     {:noreply,
-     assign_votes(socket, socket.assigns.current_scope, socket.assigns.soiree, socket.assigns.is_host)}
+     assign_votes(
+       socket,
+       socket.assigns.current_scope,
+       socket.assigns.soiree,
+       socket.assigns.is_host
+     )}
   end
 
   defp host_invitations(scope, soiree, true),
