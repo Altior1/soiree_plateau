@@ -6,7 +6,7 @@ defmodule SoireePlateau.Teuf do
   import Ecto.Query, warn: false
   alias SoireePlateau.Repo
 
-  alias SoireePlateau.Teuf.{Soiree, Invitation}
+  alias SoireePlateau.Teuf.{Soiree, Invitation, Vote}
   alias SoireePlateau.Accounts.{Scope, User}
 
   @doc """
@@ -49,6 +49,17 @@ defmodule SoireePlateau.Teuf do
   def subscribe_user_invitations(%Scope{} = scope) do
     key = scope.user.id
     Phoenix.PubSub.subscribe(SoireePlateau.PubSub, "user:#{key}:invitations")
+  end
+
+  @doc """
+  Subscribes to vote changes for a given soiree.
+
+  Broadcasted messages:
+
+    * {:vote_cast, %Vote{}}
+  """
+  def subscribe_soiree_votes(soiree_id) when is_integer(soiree_id) do
+    Phoenix.PubSub.subscribe(SoireePlateau.PubSub, "soiree:#{soiree_id}:votes")
   end
 
   require Logger
@@ -125,6 +136,23 @@ defmodule SoireePlateau.Teuf do
   """
   def get_soiree!(%Scope{} = scope, id) do
     Repo.get_by!(Soiree, id: id, host: scope.user.id)
+  end
+
+  @doc """
+  Gets a soiree visible to the current user — either as host or as an invitee.
+
+  Raises `Ecto.NoResultsError` if the user has no relation to the soiree.
+  """
+  def get_visible_soiree!(%Scope{} = scope, id) do
+    user_id = scope.user.id
+
+    Repo.one!(
+      from s in Soiree,
+        left_join: i in Invitation,
+        on: i.soiree_id == s.id and i.user_id == ^user_id,
+        where: s.id == ^id and (s.host == ^user_id or not is_nil(i.id)),
+        distinct: true
+    )
   end
 
   @doc """
@@ -415,6 +443,164 @@ defmodule SoireePlateau.Teuf do
 
   defp parse_id(id) when is_binary(id) do
     case Integer.parse(id) do
+      {int, _} -> int
+      :error -> nil
+    end
+  end
+
+  ## Votes
+
+  @doc """
+  Returns the games a user is allowed to vote on for a given soiree.
+
+  Today a soiree has at most one game; this returns a list to stay forward
+  compatible with the planned "many games per soiree" evolution.
+  """
+  def votable_games(%Soiree{} = soiree) do
+    case soiree.game_id do
+      nil -> []
+      _ -> [soiree.game_id]
+    end
+  end
+
+  @doc """
+  Returns true when the current user is invited to the soiree with status `:yes`.
+  """
+  def confirmed_invitee?(%Scope{} = scope, %Soiree{} = soiree) do
+    user_id = scope.user.id
+
+    Repo.exists?(
+      from i in Invitation,
+        where: i.soiree_id == ^soiree.id and i.user_id == ^user_id and i.status == :yes
+    )
+  end
+
+  @doc """
+  Returns true when the soiree's date is in the past.
+  """
+  def soiree_past?(%Soiree{date: nil}), do: false
+
+  def soiree_past?(%Soiree{date: date}) do
+    NaiveDateTime.compare(date, NaiveDateTime.utc_now()) == :lt
+  end
+
+  @doc """
+  Fetches the current user's vote for a soiree+game tuple, or nil.
+  """
+  def get_user_vote(%Scope{} = scope, %Soiree{} = soiree, game_id)
+      when is_integer(game_id) do
+    Repo.get_by(Vote,
+      user_id: scope.user.id,
+      soiree_id: soiree.id,
+      game_id: game_id
+    )
+  end
+
+  @doc """
+  Lists votes for a soiree (host view), with user and game preloaded.
+  Only callable by the host.
+  """
+  def list_votes_for_soiree(%Scope{} = scope, %Soiree{} = soiree) do
+    true = soiree.host == scope.user.id
+
+    Repo.all(
+      from v in Vote,
+        where: v.soiree_id == ^soiree.id,
+        join: u in assoc(v, :user),
+        join: g in assoc(v, :game),
+        order_by: [asc: g.name, asc: u.email],
+        preload: [user: u, game: g]
+    )
+  end
+
+  @doc """
+  Returns the per-game vote summary for a soiree (average + count).
+
+      [%{game_id: 1, average: 4.2, count: 5}, ...]
+  """
+  def vote_summary_for_soiree(%Soiree{} = soiree) do
+    Repo.all(
+      from v in Vote,
+        where: v.soiree_id == ^soiree.id,
+        group_by: v.game_id,
+        select: %{
+          game_id: v.game_id,
+          average: avg(v.rating),
+          count: count(v.id)
+        }
+    )
+  end
+
+  @doc """
+  Casts (or updates) the current user's vote for a soiree+game.
+
+  Authorization rules:
+
+    * The user must be invited with status `:yes`.
+    * The soiree must already have happened.
+    * The game must be one of the soiree's games.
+
+  Returns `{:ok, %Vote{}}` or `{:error, atom | %Ecto.Changeset{}}`.
+  """
+  def cast_vote(%Scope{} = scope, %Soiree{} = soiree, attrs) do
+    rating = parse_rating(attrs[:rating] || attrs["rating"])
+    game_id = parse_id(attrs[:game_id] || attrs["game_id"])
+
+    cond do
+      not confirmed_invitee?(scope, soiree) ->
+        {:error, :not_invited}
+
+      not soiree_past?(soiree) ->
+        {:error, :soiree_not_finished}
+
+      game_id == nil or game_id not in votable_games(soiree) ->
+        {:error, :invalid_game}
+
+      true ->
+        upsert_vote(scope, soiree, game_id, rating)
+    end
+  end
+
+  defp upsert_vote(%Scope{} = scope, %Soiree{} = soiree, game_id, rating) do
+    base = get_user_vote(scope, soiree, game_id) || %Vote{}
+
+    attrs = %{
+      rating: rating,
+      user_id: scope.user.id,
+      soiree_id: soiree.id,
+      game_id: game_id
+    }
+
+    with {:ok, vote} <-
+           base
+           |> Vote.changeset(attrs)
+           |> Repo.insert_or_update() do
+      vote = Repo.preload(vote, [:user, :game])
+      broadcast_vote(soiree.id, {:vote_cast, vote})
+      {:ok, vote}
+    end
+  end
+
+  defp broadcast_vote(soiree_id, message) do
+    case Phoenix.PubSub.broadcast(
+           SoireePlateau.PubSub,
+           "soiree:#{soiree_id}:votes",
+           message
+         ) do
+      :ok ->
+        :ok
+
+      {:error, reason} ->
+        Logger.warning("Failed to broadcast vote: #{inspect(reason)}")
+        {:error, reason}
+    end
+  end
+
+  defp parse_rating(nil), do: nil
+  defp parse_rating(n) when is_integer(n), do: n
+
+  defp parse_rating(s) when is_binary(s) do
+    case Integer.parse(s) do
       {int, _} -> int
       :error -> nil
     end
