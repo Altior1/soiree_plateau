@@ -33,7 +33,10 @@ defmodule SoireePlateauWeb.InvitationLive.Index do
                   Hôte : {inv.soiree.user.email}
                 </p>
               </div>
-              <span class={["inline-block self-start rounded-full px-2 py-0.5 text-xs", status_badge(inv.status)]}>
+              <span class={[
+                "inline-block self-start rounded-full px-2 py-0.5 text-xs",
+                status_badge(inv.status)
+              ]}>
                 {status_label(inv.status)}
               </span>
             </header>
@@ -44,7 +47,10 @@ defmodule SoireePlateauWeb.InvitationLive.Index do
                 phx-click="respond"
                 phx-value-id={inv.id}
                 phx-value-status="yes"
-                class={["btn", if(inv.status == :yes, do: "btn-primary", else: "btn-primary btn-soft")]}
+                class={[
+                  "btn",
+                  if(inv.status == :yes, do: "btn-primary", else: "btn-primary btn-soft")
+                ]}
               >
                 Oui
               </button>
@@ -53,7 +59,10 @@ defmodule SoireePlateauWeb.InvitationLive.Index do
                 phx-click="respond"
                 phx-value-id={inv.id}
                 phx-value-status="maybe"
-                class={["btn", if(inv.status == :maybe, do: "btn-primary", else: "btn-primary btn-soft")]}
+                class={[
+                  "btn",
+                  if(inv.status == :maybe, do: "btn-primary", else: "btn-primary btn-soft")
+                ]}
               >
                 Peut-être
               </button>

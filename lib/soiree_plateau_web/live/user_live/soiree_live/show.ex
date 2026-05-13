@@ -51,7 +51,10 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
                   </span>
                 </td>
                 <td class="py-2">
-                  <span class={["inline-block rounded-full px-2 py-0.5 text-xs", status_badge(inv.status)]}>
+                  <span class={[
+                    "inline-block rounded-full px-2 py-0.5 text-xs",
+                    status_badge(inv.status)
+                  ]}>
                     {status_label(inv.status)}
                   </span>
                 </td>
@@ -88,7 +91,10 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
      socket
      |> assign(:page_title, "Détails de la soirée")
      |> assign(:soiree, soiree)
-     |> assign(:invitations, Teuf.list_invitations_for_soiree(socket.assigns.current_scope, soiree))}
+     |> assign(
+       :invitations,
+       Teuf.list_invitations_for_soiree(socket.assigns.current_scope, soiree)
+     )}
   end
 
   @impl true
