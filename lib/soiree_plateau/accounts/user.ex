@@ -13,6 +13,7 @@ defmodule SoireePlateau.Accounts.User do
     has_many :soirees, SoireePlateau.Teuf.Soiree, foreign_key: :host
     has_many :invitations, SoireePlateau.Teuf.Invitation
     has_many :invited_to_soirees, through: [:invitations, :soiree]
+    has_many :votes, SoireePlateau.Teuf.Vote
 
     timestamps(type: :utc_datetime)
   end
