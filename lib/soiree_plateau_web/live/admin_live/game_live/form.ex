@@ -10,20 +10,20 @@ defmodule SoireePlateauWeb.GameLive.Form do
     <Layouts.app flash={@flash}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage game records in your database.</:subtitle>
+        <:subtitle>Utilisez ce formulaire pour gérer les jeux dans la base de données.</:subtitle>
       </.header>
 
       <.form for={@form} id="game-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:name]} type="text" label="Name" />
+        <.input field={@form[:name]} type="text" label="Nom" />
         <.input field={@form[:description]} type="textarea" label="Description" />
-        <.input field={@form[:image_url]} type="text" label="Image URL" />
-        <.input field={@form[:nb_players_min]} type="number" label="Minimum Number of Players" />
-        <.input field={@form[:nb_players_max]} type="number" label="Maximum Number of Players" />
-        <.input field={@form[:duration]} type="number" label="Duration (minutes)" />
-        <.input field={@form[:complexity]} type="number" label="Complexity (1-5)" min="1" max="5" />
+        <.input field={@form[:image_url]} type="text" label="URL de l'image" />
+        <.input field={@form[:nb_players_min]} type="number" label="Nombre minimum de joueurs" />
+        <.input field={@form[:nb_players_max]} type="number" label="Nombre maximum de joueurs" />
+        <.input field={@form[:duration]} type="number" label="Durée (minutes)" />
+        <.input field={@form[:complexity]} type="number" label="Complexité (1-5)" min="1" max="5" />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Game</.button>
-          <.button navigate={return_path(@return_to, @game)}>Cancel</.button>
+          <.button phx-disable-with="Enregistrement..." variant="primary">Enregistrer le jeu</.button>
+          <.button navigate={return_path(@return_to, @game)}>Annuler</.button>
         </footer>
       </.form>
     </Layouts.app>
@@ -45,7 +45,7 @@ defmodule SoireePlateauWeb.GameLive.Form do
     game = Games.get_game!(id)
 
     socket
-    |> assign(:page_title, "Edit Game")
+    |> assign(:page_title, "Modifier le jeu")
     |> assign(:game, game)
     |> assign(:form, to_form(Games.change_game(game)))
   end
@@ -54,7 +54,7 @@ defmodule SoireePlateauWeb.GameLive.Form do
     game = %Game{}
 
     socket
-    |> assign(:page_title, "New Game")
+    |> assign(:page_title, "Nouveau jeu")
     |> assign(:game, game)
     |> assign(:form, to_form(Games.change_game(game)))
   end
@@ -81,7 +81,7 @@ defmodule SoireePlateauWeb.GameLive.Form do
       {:ok, game} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Game updated successfully")
+         |> put_flash(:info, "Jeu modifié avec succès")
          |> push_navigate(to: return_path(socket.assigns.return_to, game))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -94,7 +94,7 @@ defmodule SoireePlateauWeb.GameLive.Form do
       {:ok, game} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Game created successfully")
+         |> put_flash(:info, "Jeu créé avec succès")
          |> push_navigate(to: return_path(socket.assigns.return_to, game))}
 
       {:error, %Ecto.Changeset{} = changeset} ->

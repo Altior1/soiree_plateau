@@ -11,7 +11,7 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
         Liste des soirées
         <:actions>
           <.button variant="primary" navigate={~p"/users/soirees/new"}>
-            <.icon name="hero-plus" /> New Soiree
+            <.icon name="hero-plus" /> Nouvelle soirée
           </.button>
         </:actions>
       </.header>
@@ -21,22 +21,22 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
         rows={@streams.soirees}
         row_click={fn {_id, soiree} -> JS.navigate(~p"/users/soirees/#{soiree}") end}
       >
-        <:col :let={{_id, soiree}} label="Title">{soiree.title}</:col>
+        <:col :let={{_id, soiree}} label="Titre">{soiree.title}</:col>
         <:col :let={{_id, soiree}} label="Date">{soiree.date}</:col>
-        <:col :let={{_id, soiree}} label="Home">{soiree.home}</:col>
-        <:col :let={{_id, soiree}} label="Capacity">{soiree.capacity}</:col>
+        <:col :let={{_id, soiree}} label="Lieu">{soiree.home}</:col>
+        <:col :let={{_id, soiree}} label="Capacité">{soiree.capacity}</:col>
         <:action :let={{_id, soiree}}>
           <div class="sr-only">
-            <.link navigate={~p"/users/soirees/#{soiree}"}>Show</.link>
+            <.link navigate={~p"/users/soirees/#{soiree}"}>Voir</.link>
           </div>
-          <.link navigate={~p"/users/soirees/#{soiree}/edit"}>Edit</.link>
+          <.link navigate={~p"/users/soirees/#{soiree}/edit"}>Modifier</.link>
         </:action>
         <:action :let={{id, soiree}}>
           <.link
             phx-click={JS.push("delete", value: %{id: soiree.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="Confirmer la suppression ?"
           >
-            Delete
+            Supprimer
           </.link>
         </:action>
       </.table>
@@ -52,7 +52,7 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Soirees")
+     |> assign(:page_title, "Liste des soirées")
      |> stream(:soirees, list_soirees(socket.assigns.current_scope))}
   end
 
