@@ -35,21 +35,34 @@ defmodule SoireePlateauWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
-      <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <.theme_toggle />
-          </li>
-        </ul>
+    <header class="sticky top-0 z-20 border-b bg-white/60 backdrop-blur">
+      <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-4">
+          <a href="/" class="text-lg font-semibold text-gray-900">Soirée Plateau</a>
+          <nav class="hidden md:flex gap-4 text-sm text-gray-700">
+            <.link navigate={~p"/"} class="hover:underline">Accueil</.link>
+            <.link navigate={~p"/users/soirees"} class="hover:underline">Soirées</.link>
+            <.link navigate={~p"/users/games"} class="hover:underline">Jeux</.link>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <.theme_toggle />
+        </div>
       </div>
     </header>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
-        {render_slot(@inner_block)}
+    <main class="px-4 py-12 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="rounded-lg bg-transparent">
+          {render_slot(@inner_block)}
+        </div>
       </div>
     </main>
+
+    <footer class="border-t py-6 text-center text-sm text-gray-500">
+      © {Date.utc_today().year} Soiree Plateau • Convivialité & jeux de société
+    </footer>
 
     <.flash_group flash={@flash} />
     """
