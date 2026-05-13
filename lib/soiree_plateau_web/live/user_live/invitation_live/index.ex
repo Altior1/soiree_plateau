@@ -98,6 +98,7 @@ defmodule SoireePlateauWeb.InvitationLive.Index do
   @impl true
   def handle_event("respond", %{"id" => id, "status" => status}, socket) do
     invitation = Teuf.get_user_invitation!(socket.assigns.current_scope, id)
+
     status_atom =
       case status do
         "pending" -> :pending

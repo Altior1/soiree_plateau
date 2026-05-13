@@ -366,16 +366,18 @@ defmodule SoireePlateau.Teuf do
            })
            |> Repo.insert() do
         {:ok, inv} ->
-          inv = Repo.preload(inv, [:user, soiree: [:user, :game]])
-          %Invitation{} = inv ->
-            case Repo.delete(inv) do
-              {:ok, deleted} ->
-                broadcast_invitation_to_user(user_id, {:invitation_deleted, deleted})
-                broadcast_invitation_to_soiree(soiree.id, {:invitation_deleted, deleted})
+          _inv = Repo.preload(inv, [:user, soiree: [:user, :game]])
 
-              {:error, _changeset} ->
-                :noop
-            end
+        %Invitation{} = inv ->
+          case Repo.delete(inv) do
+            {:ok, deleted} ->
+              broadcast_invitation_to_user(user_id, {:invitation_deleted, deleted})
+              broadcast_invitation_to_soiree(soiree.id, {:invitation_deleted, deleted})
+
+            {:error, _changeset} ->
+              :noop
+          end
+
           broadcast_invitation_to_soiree(soiree.id, {:invitation_created, inv})
 
         {:error, _} ->

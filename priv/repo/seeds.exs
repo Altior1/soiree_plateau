@@ -194,6 +194,7 @@ set_status.(soiree_2, bob, :yes)
 set_status.(soiree_2, emma, :maybe)
 
 IO.puts("✓ 3 soirées créées avec invitations + RSVP variés")
+
 IO.puts("""
 
 Comptes de test (mot de passe : #{password}) :
