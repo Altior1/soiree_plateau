@@ -10,6 +10,9 @@ defmodule SoireePlateau.Teuf.Soiree do
     belongs_to :user, SoireePlateau.Accounts.User, foreign_key: :host
     belongs_to :game, SoireePlateau.Games.Game
 
+    has_many :invitations, SoireePlateau.Teuf.Invitation, on_delete: :delete_all
+    has_many :invitees, through: [:invitations, :user]
+
     timestamps(type: :utc_datetime)
   end
 

@@ -11,6 +11,8 @@ defmodule SoireePlateau.Accounts.User do
     field :is_admin, :boolean, default: false
 
     has_many :soirees, SoireePlateau.Teuf.Soiree, foreign_key: :host
+    has_many :invitations, SoireePlateau.Teuf.Invitation
+    has_many :invited_to_soirees, through: [:invitations, :soiree]
 
     timestamps(type: :utc_datetime)
   end
