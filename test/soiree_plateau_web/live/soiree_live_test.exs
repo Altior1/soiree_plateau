@@ -108,6 +108,23 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
       assert html =~ soiree.title
     end
 
+    test "host sees the vote summary block", %{conn: conn, scope: scope} do
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        SoireePlateau.Teuf.create_soiree(scope, %{
+          title: "past",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id
+        })
+
+      {:ok, _show_live, html} = live(conn, ~p"/users/soirees/#{soiree}")
+      assert html =~ "Notes reçues"
+      assert html =~ "Aucune note pour l&#39;instant"
+    end
+
     test "updates soiree and returns to show", %{conn: conn, soiree: soiree} do
       {:ok, show_live, _html} = live(conn, ~p"/users/soirees/#{soiree}")
 

@@ -319,35 +319,37 @@ defmodule SoireePlateau.TeufTest do
     end
   end
 
+  defp past_soiree_with_guest(opts \\ []) do
+    import SoireePlateau.AccountsFixtures
+
+    host_scope = user_scope_fixture()
+    guest = user_fixture()
+    game = SoireePlateau.GamesFixtures.game_fixture()
+
+    attrs = %{
+      title: "passed",
+      date: opts[:date] || ~N[2020-01-01 18:00:00],
+      home: "h",
+      capacity: 5,
+      game_id: game.id,
+      invitee_ids: [guest.id]
+    }
+
+    {:ok, soiree} = Teuf.create_soiree(host_scope, attrs)
+    soiree = SoireePlateau.Repo.preload(soiree, :game)
+
+    guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
+    [invitation] = Teuf.list_invitations_for_user(guest_scope)
+    {:ok, _} = Teuf.respond_to_invitation(guest_scope, invitation, :yes)
+
+    %{host_scope: host_scope, guest: guest, guest_scope: guest_scope, soiree: soiree, game: game}
+  end
+
   describe "votes" do
     alias SoireePlateau.Teuf.Vote
 
     import SoireePlateau.AccountsFixtures
     import SoireePlateau.TeufFixtures
-
-    defp past_soiree_with_guest(opts \\ []) do
-      host_scope = user_scope_fixture()
-      guest = user_fixture()
-      game = SoireePlateau.GamesFixtures.game_fixture()
-
-      attrs = %{
-        title: "passed",
-        date: opts[:date] || ~N[2020-01-01 18:00:00],
-        home: "h",
-        capacity: 5,
-        game_id: game.id,
-        invitee_ids: [guest.id]
-      }
-
-      {:ok, soiree} = Teuf.create_soiree(host_scope, attrs)
-      soiree = SoireePlateau.Repo.preload(soiree, :game)
-
-      guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
-      [invitation] = Teuf.list_invitations_for_user(guest_scope)
-      {:ok, _} = Teuf.respond_to_invitation(guest_scope, invitation, :yes)
-
-      %{host_scope: host_scope, guest: guest, guest_scope: guest_scope, soiree: soiree, game: game}
-    end
 
     test "cast_vote/3 inserts a new vote" do
       %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
