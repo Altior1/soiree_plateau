@@ -48,7 +48,10 @@ defmodule SoireePlateau.Accounts.User do
       |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/,
         message: "doit contenir le caractère @ et ne doit pas contenir d'espaces"
       )
-      |> validate_length(:email, max: 160, message: "doit contenir au maximum %{count} caractères")
+      |> validate_length(:email,
+        max: 160,
+        message: "doit contenir au maximum %{count} caractères"
+      )
 
     if Keyword.get(opts, :validate_unique, true) do
       changeset
@@ -94,7 +97,10 @@ defmodule SoireePlateau.Accounts.User do
     changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 12, message: "doit contenir au moins %{count} caractères")
-    |> validate_length(:password, max: 72, message: "doit contenir au maximum %{count} caractères")
+    |> validate_length(:password,
+      max: 72,
+      message: "doit contenir au maximum %{count} caractères"
+    )
     # Examples of additional password validation:
     # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
     # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")

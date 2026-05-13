@@ -20,7 +20,9 @@ defmodule SoireePlateauWeb.SoireeLive.Form do
         <.input field={@form[:capacity]} type="number" label="Capacité" />
         <.input field={@form[:game_id]} type="select" label="Jeu" options={@options_games} />
         <footer>
-          <.button phx-disable-with="Enregistrement..." variant="primary">Enregistrer la soirée</.button>
+          <.button phx-disable-with="Enregistrement..." variant="primary">
+            Enregistrer la soirée
+          </.button>
           <.button navigate={return_path(@current_scope, @return_to, @soiree)}>Annuler</.button>
         </footer>
       </.form>

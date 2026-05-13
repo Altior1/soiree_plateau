@@ -118,7 +118,7 @@ defmodule SoireePlateauWeb.UserLive.SettingsTest do
       assert get_session(new_password_conn, :user_token) != get_session(conn, :user_token)
 
       assert Phoenix.Flash.get(new_password_conn.assigns.flash, :info) =~
-           "Mot de passe mis à jour avec succès"
+               "Mot de passe mis à jour avec succès"
 
       assert Accounts.get_user_by_email_and_password(user.email, new_password)
     end

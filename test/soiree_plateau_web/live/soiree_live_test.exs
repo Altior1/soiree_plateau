@@ -119,9 +119,9 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
 
       assert render(form_live) =~ "Modifier la soirée"
 
-                  assert form_live
-                    |> form("#soiree-form", soiree: @invalid_attrs)
-                    |> render_change() =~ "can&#39;t be blank"
+      assert form_live
+             |> form("#soiree-form", soiree: @invalid_attrs)
+             |> render_change() =~ "can&#39;t be blank"
 
       assert {:ok, show_live, _html} =
                form_live

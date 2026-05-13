@@ -3,6 +3,8 @@ defmodule SoireePlateauWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Soirées jeux de société — Partagez, jouez, créez des souvenirs"
+
+    assert html_response(conn, 200) =~
+             "Soirées jeux de société — Partagez, jouez, créez des souvenirs"
   end
 end

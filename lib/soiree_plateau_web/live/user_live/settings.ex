@@ -25,7 +25,9 @@ defmodule SoireePlateauWeb.UserLive.Settings do
           spellcheck="false"
           required
         />
-        <.button variant="primary" phx-disable-with="Enregistrement...">Modifier l'adresse e-mail</.button>
+        <.button variant="primary" phx-disable-with="Enregistrement...">
+          Modifier l'adresse e-mail
+        </.button>
       </.form>
 
       <div class="divider" />
@@ -80,7 +82,7 @@ defmodule SoireePlateauWeb.UserLive.Settings do
           put_flash(socket, :error, "Le lien de changement d'e-mail est invalide ou a expiré.")
       end
 
-        {:ok, push_navigate(socket, to: ~p"/users/settings")}
+    {:ok, push_navigate(socket, to: ~p"/users/settings")}
   end
 
   def mount(_params, _session, socket) do

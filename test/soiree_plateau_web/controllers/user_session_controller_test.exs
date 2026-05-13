@@ -123,7 +123,7 @@ defmodule SoireePlateauWeb.UserSessionControllerTest do
         })
 
       assert Phoenix.Flash.get(conn.assigns.flash, :error) ==
-           "Le lien est invalide ou a expiré."
+               "Le lien est invalide ou a expiré."
 
       assert redirected_to(conn) == ~p"/users/log-in"
     end

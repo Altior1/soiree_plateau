@@ -55,8 +55,8 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
         %{assigns: %{soiree: %{id: id}}} = socket
       ) do
     {:noreply,
-    socket
-    |> put_flash(:error, "La soirée a été supprimée.")
+     socket
+     |> put_flash(:error, "La soirée a été supprimée.")
      |> push_navigate(to: ~p"/users/soirees")}
   end
 

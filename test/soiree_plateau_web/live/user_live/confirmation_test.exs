@@ -59,7 +59,7 @@ defmodule SoireePlateauWeb.UserLive.ConfirmationTest do
       conn = follow_trigger_action(form, conn)
 
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~
-           "Utilisateur confirmé avec succès"
+               "Utilisateur confirmé avec succès"
 
       assert Accounts.get_user!(user.id).confirmed_at
       # we are logged in now
@@ -93,7 +93,7 @@ defmodule SoireePlateauWeb.UserLive.ConfirmationTest do
       conn = follow_trigger_action(form, conn)
 
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~
-           "Bon retour !"
+               "Bon retour !"
 
       assert Accounts.get_user!(user.id).confirmed_at == user.confirmed_at
 

@@ -30,7 +30,10 @@ defmodule SoireePlateauWeb.UserLive.Login do
           <div>
             <p>Vous utilisez l'adaptateur de mail local.</p>
             <p>
-              Pour voir les e-mails envoyés, rendez-vous sur <.link href="/dev/mailbox" class="underline">la page de la boîte mail</.link>.
+              Pour voir les e-mails envoyés, rendez-vous sur <.link
+                href="/dev/mailbox"
+                class="underline"
+              >la page de la boîte mail</.link>.
             </p>
           </div>
         </div>
@@ -42,7 +45,7 @@ defmodule SoireePlateauWeb.UserLive.Login do
           action={~p"/users/log-in"}
           phx-submit="submit_magic"
         >
-            <.input
+          <.input
             readonly={!!@current_scope}
             field={f[:email]}
             type="email"
