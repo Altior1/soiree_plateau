@@ -282,6 +282,102 @@ defmodule SoireePlateau.Teuf do
     Soiree.changeset(soiree, attrs, scope)
   end
 
+  ## History (US12)
+
+  @doc """
+  Returns the user's past-soiree history: soirees the user RSVP'd `:yes` to,
+  whose date is in the past and which have not been cancelled.
+
+  Each returned soiree is preloaded with `:game` and `:user` (the host), and
+  augmented with a virtual `:my_vote` field holding the user's `%Vote{}` for
+  that soiree (or `nil` if the user did not rate).
+
+  Sorted by date desc (most recent first).
+  """
+  def list_user_history(%Scope{} = scope) do
+    user_id = scope.user.id
+    now = NaiveDateTime.utc_now()
+
+    soirees =
+      Repo.all(
+        from s in Soiree,
+          join: i in Invitation,
+          on: i.soiree_id == s.id,
+          where:
+            i.user_id == ^user_id and
+              i.status == :yes and
+              s.date < ^now and
+              s.status == :active,
+          order_by: [desc: s.date],
+          preload: [:game, :user]
+      )
+
+    case Enum.map(soirees, & &1.id) do
+      [] ->
+        []
+
+      soiree_ids ->
+        votes_map =
+          Repo.all(
+            from v in Vote,
+              where: v.user_id == ^user_id and v.soiree_id in ^soiree_ids,
+              preload: [:game]
+          )
+          |> Map.new(fn vote -> {vote.soiree_id, vote} end)
+
+        Enum.map(soirees, fn s -> Map.put(s, :my_vote, Map.get(votes_map, s.id)) end)
+    end
+  end
+
+  @doc """
+  Returns aggregated stats about the current user's history.
+
+  Map keys:
+
+    * `:soirees_count` — number of past, non-cancelled, confirmed-yes soirees
+    * `:distinct_games` — number of distinct games played across those soirees
+    * `:average_rating` — average rating the user has given across all their
+      votes (on non-cancelled soirees), as a `Decimal` or `nil` if no votes
+  """
+  def user_history_stats(%Scope{} = scope) do
+    user_id = scope.user.id
+    now = NaiveDateTime.utc_now()
+
+    base_query =
+      from s in Soiree,
+        join: i in Invitation,
+        on: i.soiree_id == s.id,
+        where:
+          i.user_id == ^user_id and
+            i.status == :yes and
+            s.date < ^now and
+            s.status == :active
+
+    soirees_count = Repo.one(from s in base_query, select: count(s.id)) || 0
+
+    distinct_games =
+      Repo.one(
+        from s in base_query,
+          where: not is_nil(s.game_id),
+          select: count(s.game_id, :distinct)
+      ) || 0
+
+    average_rating =
+      Repo.one(
+        from v in Vote,
+          join: s in Soiree,
+          on: s.id == v.soiree_id,
+          where: v.user_id == ^user_id and s.status == :active,
+          select: avg(v.rating)
+      )
+
+    %{
+      soirees_count: soirees_count,
+      distinct_games: distinct_games,
+      average_rating: average_rating
+    }
+  end
+
   ## Invitations
 
   @doc """
