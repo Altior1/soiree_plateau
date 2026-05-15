@@ -49,6 +49,13 @@ defmodule SoireePlateauWeb.Layouts do
             >
               Mes invitations
             </.link>
+            <.link
+              :if={@current_scope}
+              navigate={~p"/users/historique"}
+              class="hover:underline"
+            >
+              Mon historique
+            </.link>
             <.link navigate={~p"/users/games"} class="hover:underline">Jeux</.link>
           </nav>
         </div>

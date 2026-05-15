@@ -715,4 +715,145 @@ defmodule SoireePlateau.TeufTest do
       assert Teuf.cancelled?(cancelled)
     end
   end
+
+  describe "user history (US12)" do
+    import SoireePlateau.AccountsFixtures
+    import SoireePlateau.TeufFixtures
+
+    defp create_past_soiree_with(opts) do
+      host_scope = opts[:host_scope] || user_scope_fixture()
+      game = opts[:game] || SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        Teuf.create_soiree(host_scope, %{
+          title: opts[:title] || "passed",
+          date: opts[:date] || ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id,
+          invitee_ids: Enum.map(opts[:invitees] || [], & &1.id)
+        })
+
+      {host_scope, soiree, game}
+    end
+
+    defp respond(user, soiree, status) do
+      scope = SoireePlateau.Accounts.Scope.for_user(user)
+
+      invitation =
+        SoireePlateau.Repo.get_by!(SoireePlateau.Teuf.Invitation,
+          user_id: user.id,
+          soiree_id: soiree.id
+        )
+
+      {:ok, _} = Teuf.respond_to_invitation(scope, invitation, status)
+      scope
+    end
+
+    test "list_user_history/1 only returns past, confirmed-yes, non-cancelled soirees" do
+      user = user_fixture()
+
+      # 1) past + yes + active → in
+      {_h1, kept, _g1} = create_past_soiree_with(invitees: [user], title: "kept")
+      respond(user, kept, :yes)
+
+      # 2) past + yes + cancelled → out
+      {host2, s2, _g2} =
+        create_past_soiree_with(invitees: [user], title: "cancelled")
+
+      respond(user, s2, :yes)
+      {:ok, _} = Teuf.cancel_soiree(host2, s2)
+
+      # 3) future + yes + active → out
+      future = NaiveDateTime.utc_now() |> NaiveDateTime.add(86_400, :second)
+
+      {_h, future_soiree, _} =
+        create_past_soiree_with(invitees: [user], title: "future", date: future)
+
+      respond(user, future_soiree, :yes)
+
+      # 4) past + no + active → out
+      {_h, no_soiree, _} = create_past_soiree_with(invitees: [user], title: "declined")
+      respond(user, no_soiree, :no)
+
+      # 5) past + maybe → out
+      {_h, maybe_soiree, _} = create_past_soiree_with(invitees: [user], title: "maybe")
+      respond(user, maybe_soiree, :maybe)
+
+      # 6) past + pending (no response) → out
+      _ = create_past_soiree_with(invitees: [user], title: "pending")
+
+      # 7) soirée d'un autre user → out
+      _ = create_past_soiree_with(title: "other")
+
+      scope = SoireePlateau.Accounts.Scope.for_user(user)
+      history = Teuf.list_user_history(scope)
+
+      titles = Enum.map(history, & &1.title)
+      assert titles == ["kept"]
+    end
+
+    test "list_user_history/1 attaches my_vote to each entry" do
+      user = user_fixture()
+      {_host_scope, soiree, game} = create_past_soiree_with(invitees: [user])
+      scope = respond(user, soiree, :yes)
+      {:ok, _} = Teuf.cast_vote(scope, soiree, %{rating: 4, comment: "fun", game_id: game.id})
+
+      [entry] = Teuf.list_user_history(scope)
+      assert entry.id == soiree.id
+      assert entry.my_vote.rating == 4
+      assert entry.my_vote.comment == "fun"
+    end
+
+    test "list_user_history/1 returns nil my_vote when the user did not rate" do
+      user = user_fixture()
+      {_, soiree, _} = create_past_soiree_with(invitees: [user])
+      scope = respond(user, soiree, :yes)
+
+      [entry] = Teuf.list_user_history(scope)
+      assert is_nil(entry.my_vote)
+    end
+
+    test "list_user_history/1 returns [] for a user with no participation" do
+      user = user_fixture()
+      _ = create_past_soiree_with(title: "not for them")
+
+      scope = SoireePlateau.Accounts.Scope.for_user(user)
+      assert Teuf.list_user_history(scope) == []
+    end
+
+    test "user_history_stats/1 aggregates soirees, distinct games and average rating" do
+      user = user_fixture()
+      game_a = SoireePlateau.GamesFixtures.game_fixture()
+      game_b = SoireePlateau.GamesFixtures.game_fixture(%{name: "another"})
+
+      {_h, s1, _} = create_past_soiree_with(invitees: [user], game: game_a, title: "a1")
+      scope = respond(user, s1, :yes)
+      {_h, s2, _} = create_past_soiree_with(invitees: [user], game: game_a, title: "a2")
+      respond(user, s2, :yes)
+      {_h, s3, _} = create_past_soiree_with(invitees: [user], game: game_b, title: "b1")
+      respond(user, s3, :yes)
+
+      {:ok, _} = Teuf.cast_vote(scope, s1, %{rating: 5, game_id: game_a.id})
+      {:ok, _} = Teuf.cast_vote(scope, s2, %{rating: 3, game_id: game_a.id})
+      {:ok, _} = Teuf.cast_vote(scope, s3, %{rating: 4, game_id: game_b.id})
+
+      stats = Teuf.user_history_stats(scope)
+      assert stats.soirees_count == 3
+      assert stats.distinct_games == 2
+
+      # average = (5+3+4)/3 = 4.0
+      assert Decimal.equal?(Decimal.round(stats.average_rating, 1), Decimal.new("4.0"))
+    end
+
+    test "user_history_stats/1 returns zeros and nil for an empty history" do
+      user = user_fixture()
+      scope = SoireePlateau.Accounts.Scope.for_user(user)
+      stats = Teuf.user_history_stats(scope)
+
+      assert stats.soirees_count == 0
+      assert stats.distinct_games == 0
+      assert is_nil(stats.average_rating)
+    end
+  end
 end
