@@ -125,6 +125,66 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
       assert html =~ "Aucune note pour l&#39;instant"
     end
 
+    test "confirmed invitee can rate with a comment and see it back", %{conn: _conn, scope: scope} do
+      game = SoireePlateau.GamesFixtures.game_fixture()
+      guest = SoireePlateau.AccountsFixtures.user_fixture()
+
+      {:ok, soiree} =
+        SoireePlateau.Teuf.create_soiree(scope, %{
+          title: "past with guest",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id,
+          invitee_ids: [guest.id]
+        })
+
+      guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
+      [invitation] = SoireePlateau.Teuf.list_invitations_for_user(guest_scope)
+      {:ok, _} = SoireePlateau.Teuf.respond_to_invitation(guest_scope, invitation, :yes)
+
+      guest_conn = Phoenix.ConnTest.build_conn() |> log_in_user(guest)
+
+      {:ok, show_live, html} = live(guest_conn, ~p"/users/soirees/#{soiree}")
+
+      # The guest sees the rating form (with textarea) and the empty notes block.
+      assert html =~ "Noter le jeu"
+      assert html =~ "vote-comment"
+      assert html =~ "Notes reçues"
+
+      # Submit a 4/5 rating with a comment.
+      html =
+        show_live
+        |> form("#rate-form", %{"comment" => "Super soirée"})
+        |> render_submit(%{"rating" => "4"})
+
+      assert html =~ "Note enregistrée"
+      assert html =~ "Super soirée"
+      assert html =~ "4</strong>/5"
+    end
+
+    test "stranger (not invited) does not see the notes block", %{conn: _conn, scope: scope} do
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        SoireePlateau.Teuf.create_soiree(scope, %{
+          title: "past",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id
+        })
+
+      stranger = SoireePlateau.AccountsFixtures.user_fixture()
+      stranger_conn = Phoenix.ConnTest.build_conn() |> log_in_user(stranger)
+
+      # `get_visible_soiree!/2` would raise for a non-host non-invitee;
+      # asserting that confirms unauthorized users cannot reach the show page.
+      assert_raise Ecto.NoResultsError, fn ->
+        live(stranger_conn, ~p"/users/soirees/#{soiree}")
+      end
+    end
+
     test "updates soiree and returns to show", %{conn: conn, soiree: soiree} do
       {:ok, show_live, _html} = live(conn, ~p"/users/soirees/#{soiree}")
 
