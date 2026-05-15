@@ -16,14 +16,32 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
             <.icon name="hero-arrow-left" />
           </.button>
           <.button
-            :if={@is_host}
+            :if={@is_host and not @cancelled}
             variant="primary"
             navigate={~p"/users/soirees/#{@soiree}/edit?return_to=show"}
           >
             <.icon name="hero-pencil-square" /> Modifier la soirée
           </.button>
+          <.button
+            :if={@can_cancel and not @cancelled}
+            phx-click="cancel_soiree"
+            data-confirm="Annuler définitivement cette soirée ? Cette action est irréversible."
+            class="btn btn-error btn-soft"
+          >
+            <.icon name="hero-x-circle" /> Annuler la soirée
+          </.button>
         </:actions>
       </.header>
+
+      <div
+        :if={@cancelled}
+        id="cancelled-banner"
+        class="alert alert-error mb-6"
+        role="alert"
+      >
+        <.icon name="hero-x-circle" />
+        <span>Soirée annulée — les RSVP et notations sont désactivés.</span>
+      </div>
 
       <.list>
         <:item title="Titre">{@soiree.title}</:item>
@@ -164,9 +182,12 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
     is_host = soiree.host == scope.user.id
     confirmed_invitee = Teuf.confirmed_invitee?(scope, soiree)
     soiree_past = Teuf.soiree_past?(soiree)
+    cancelled = Teuf.cancelled?(soiree)
+    is_admin = scope.user.is_admin == true
 
-    can_vote = not is_host and confirmed_invitee and soiree_past
+    can_vote = not is_host and confirmed_invitee and soiree_past and not cancelled
     can_see_votes = is_host or confirmed_invitee
+    can_cancel = is_host or is_admin
 
     if connected?(socket) do
       Teuf.subscribe_soirees(scope)
@@ -197,6 +218,8 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
      |> assign(:is_host, is_host)
      |> assign(:can_vote, can_vote)
      |> assign(:can_see_votes, can_see_votes)
+     |> assign(:can_cancel, can_cancel)
+     |> assign(:cancelled, cancelled)
      |> assign(:soiree_past, soiree_past)
      |> assign(:current_rating, current_rating)
      |> assign(:current_comment, current_comment)
@@ -279,6 +302,32 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
 
   def handle_event("comment_change", %{"comment" => comment}, socket) do
     {:noreply, assign(socket, :current_comment, comment)}
+  end
+
+  def handle_event("cancel_soiree", _params, socket) do
+    scope = socket.assigns.current_scope
+    soiree = socket.assigns.soiree
+
+    case Teuf.cancel_soiree(scope, soiree) do
+      {:ok, cancelled} ->
+        cancelled = Repo.preload(cancelled, [:game, :user])
+
+        {:noreply,
+         socket
+         |> put_flash(:info, "Soirée annulée.")
+         |> assign(:soiree, cancelled)
+         |> assign(:cancelled, true)
+         |> assign(:can_vote, false)}
+
+      {:error, :unauthorized} ->
+        {:noreply, put_flash(socket, :error, "Action réservée à l'hôte ou à un admin.")}
+
+      {:error, :already_cancelled} ->
+        {:noreply, put_flash(socket, :error, "La soirée est déjà annulée.")}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Impossible d'annuler la soirée.")}
+    end
   end
 
   @impl true

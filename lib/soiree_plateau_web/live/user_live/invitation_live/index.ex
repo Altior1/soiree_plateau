@@ -124,6 +124,10 @@ defmodule SoireePlateauWeb.InvitationLive.Index do
            |> put_flash(:info, "Réponse enregistrée.")
            |> assign(:invitations, Teuf.list_invitations_for_user(socket.assigns.current_scope))}
 
+        {:error, :soiree_cancelled} ->
+          {:noreply,
+           put_flash(socket, :error, "Cette soirée a été annulée — impossible de répondre.")}
+
         {:error, %Ecto.Changeset{}} ->
           {:noreply, put_flash(socket, :error, "Impossible d'enregistrer la réponse.")}
       end
