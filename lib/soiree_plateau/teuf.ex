@@ -231,6 +231,43 @@ defmodule SoireePlateau.Teuf do
   end
 
   @doc """
+  Cancels a soiree. Only the host or an admin can cancel.
+
+  The operation is irreversible: a cancelled soiree cannot be re-activated.
+  Existing invitations and votes are preserved so the history stays intact.
+
+  Returns `{:ok, %Soiree{}}`, `{:error, :unauthorized}`,
+  `{:error, :already_cancelled}` or `{:error, %Ecto.Changeset{}}`.
+  """
+  def cancel_soiree(%Scope{} = scope, %Soiree{} = soiree) do
+    cond do
+      soiree.host != scope.user.id and not admin?(scope) ->
+        {:error, :unauthorized}
+
+      soiree.status == :cancelled ->
+        {:error, :already_cancelled}
+
+      true ->
+        with {:ok, cancelled = %Soiree{}} <-
+               soiree
+               |> Soiree.cancel_changeset()
+               |> Repo.update() do
+          broadcast_soiree(scope, {:updated, cancelled})
+          {:ok, cancelled}
+        end
+    end
+  end
+
+  @doc """
+  Returns true when a soiree is cancelled.
+  """
+  def cancelled?(%Soiree{status: :cancelled}), do: true
+  def cancelled?(%Soiree{}), do: false
+
+  defp admin?(%Scope{user: %User{is_admin: true}}), do: true
+  defp admin?(%Scope{}), do: false
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking soiree changes.
 
   ## Examples
@@ -336,14 +373,22 @@ defmodule SoireePlateau.Teuf do
   def respond_to_invitation(%Scope{} = scope, %Invitation{} = invitation, status) do
     true = invitation.user_id == scope.user.id
 
-    with {:ok, updated} <-
-           invitation
-           |> Invitation.response_changeset(%{status: status})
-           |> Repo.update() do
-      updated = Repo.preload(updated, [:user, soiree: [:user, :game]])
-      broadcast_invitation_to_soiree(updated.soiree_id, {:invitation_updated, updated})
-      broadcast_invitation_to_user(updated.user_id, {:invitation_updated, updated})
-      {:ok, updated}
+    soiree = Repo.get!(Soiree, invitation.soiree_id)
+
+    cond do
+      soiree.status == :cancelled ->
+        {:error, :soiree_cancelled}
+
+      true ->
+        with {:ok, updated} <-
+               invitation
+               |> Invitation.response_changeset(%{status: status})
+               |> Repo.update() do
+          updated = Repo.preload(updated, [:user, soiree: [:user, :game]])
+          broadcast_invitation_to_soiree(updated.soiree_id, {:invitation_updated, updated})
+          broadcast_invitation_to_user(updated.user_id, {:invitation_updated, updated})
+          {:ok, updated}
+        end
     end
   end
 
@@ -549,6 +594,9 @@ defmodule SoireePlateau.Teuf do
     comment = attrs[:comment] || attrs["comment"]
 
     cond do
+      soiree.status == :cancelled ->
+        {:error, :soiree_cancelled}
+
       not confirmed_invitee?(scope, soiree) ->
         {:error, :not_invited}
 

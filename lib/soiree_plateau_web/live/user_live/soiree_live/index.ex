@@ -21,7 +21,15 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
         rows={@streams.soirees}
         row_click={fn {_id, soiree} -> JS.navigate(~p"/users/soirees/#{soiree}") end}
       >
-        <:col :let={{_id, soiree}} label="Titre">{soiree.title}</:col>
+        <:col :let={{_id, soiree}} label="Titre">
+          {soiree.title}
+          <span
+            :if={soiree.status == :cancelled}
+            class="ml-2 inline-block rounded-full bg-error/20 px-2 py-0.5 text-xs font-semibold text-error"
+          >
+            Annulée
+          </span>
+        </:col>
         <:col :let={{_id, soiree}} label="Date">{soiree.date}</:col>
         <:col :let={{_id, soiree}} label="Lieu">{soiree.home}</:col>
         <:col :let={{_id, soiree}} label="Capacité">{soiree.capacity}</:col>
@@ -29,7 +37,12 @@ defmodule SoireePlateauWeb.SoireeLive.Index do
           <div class="sr-only">
             <.link navigate={~p"/users/soirees/#{soiree}"}>Voir</.link>
           </div>
-          <.link navigate={~p"/users/soirees/#{soiree}/edit"}>Modifier</.link>
+          <.link
+            :if={soiree.status != :cancelled}
+            navigate={~p"/users/soirees/#{soiree}/edit"}
+          >
+            Modifier
+          </.link>
         </:action>
         <:action :let={{id, soiree}}>
           <.link
