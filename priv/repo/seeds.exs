@@ -197,10 +197,32 @@ set_status.(soiree_past, david, :no)
 
 # Insérer quelques votes d'exemple pour la soirée passée (table :votes)
 now = DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_naive()
+
 votes = [
-  %{rating: 5, user_id: alice.id, soiree_id: soiree_past.id, game_id: carcassonne.id, inserted_at: now, updated_at: now},
-  %{rating: 4, user_id: bob.id, soiree_id: soiree_past.id, game_id: carcassonne.id, inserted_at: now, updated_at: now},
-  %{rating: 2, user_id: david.id, soiree_id: soiree_past.id, game_id: carcassonne.id, inserted_at: now, updated_at: now}
+  %{
+    rating: 5,
+    user_id: alice.id,
+    soiree_id: soiree_past.id,
+    game_id: carcassonne.id,
+    inserted_at: now,
+    updated_at: now
+  },
+  %{
+    rating: 4,
+    user_id: bob.id,
+    soiree_id: soiree_past.id,
+    game_id: carcassonne.id,
+    inserted_at: now,
+    updated_at: now
+  },
+  %{
+    rating: 2,
+    user_id: david.id,
+    soiree_id: soiree_past.id,
+    game_id: carcassonne.id,
+    inserted_at: now,
+    updated_at: now
+  }
 ]
 
 Repo.insert_all(:votes, votes)

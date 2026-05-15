@@ -487,11 +487,22 @@ defmodule SoireePlateau.Teuf do
   end
 
   @doc """
-  Lists votes for a soiree (host view), with user and game preloaded.
-  Only callable by the host.
+  Returns true when the scope's user is allowed to read the votes of a soiree.
+  The host can always see them; otherwise the user must be a confirmed invitee.
+  """
+  def can_view_votes?(%Scope{} = scope, %Soiree{} = soiree) do
+    soiree.host == scope.user.id or confirmed_invitee?(scope, soiree)
+  end
+
+  @doc """
+  Lists votes for a soiree, with user and game preloaded.
+
+  Callable by the host or any confirmed invitee. Raises a `MatchError` for
+  unauthorized callers; check `can_view_votes?/2` first when the caller's
+  authorization is not already guaranteed.
   """
   def list_votes_for_soiree(%Scope{} = scope, %Soiree{} = soiree) do
-    true = soiree.host == scope.user.id
+    true = can_view_votes?(scope, soiree)
 
     Repo.all(
       from v in Vote,
@@ -535,6 +546,7 @@ defmodule SoireePlateau.Teuf do
   def cast_vote(%Scope{} = scope, %Soiree{} = soiree, attrs) do
     rating = parse_rating(attrs[:rating] || attrs["rating"])
     game_id = parse_id(attrs[:game_id] || attrs["game_id"])
+    comment = attrs[:comment] || attrs["comment"]
 
     cond do
       not confirmed_invitee?(scope, soiree) ->
@@ -547,15 +559,16 @@ defmodule SoireePlateau.Teuf do
         {:error, :invalid_game}
 
       true ->
-        upsert_vote(scope, soiree, game_id, rating)
+        upsert_vote(scope, soiree, game_id, rating, comment)
     end
   end
 
-  defp upsert_vote(%Scope{} = scope, %Soiree{} = soiree, game_id, rating) do
+  defp upsert_vote(%Scope{} = scope, %Soiree{} = soiree, game_id, rating, comment) do
     base = get_user_vote(scope, soiree, game_id) || %Vote{}
 
     attrs = %{
       rating: rating,
+      comment: comment,
       user_id: scope.user.id,
       soiree_id: soiree.id,
       game_id: game_id

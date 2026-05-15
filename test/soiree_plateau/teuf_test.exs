@@ -473,17 +473,85 @@ defmodule SoireePlateau.TeufTest do
       assert %Vote{rating: 3} = Teuf.get_user_vote(scope, soiree, game.id)
     end
 
-    test "list_votes_for_soiree/2 only callable by host" do
+    test "list_votes_for_soiree/2 is callable by host and confirmed invitees, refuses strangers" do
       %{host_scope: host_scope, guest_scope: guest_scope, soiree: soiree, game: game} =
         past_soiree_with_guest()
 
       {:ok, _} = Teuf.cast_vote(guest_scope, soiree, %{rating: 4, game_id: game.id})
 
+      # Host can read
       assert [%Vote{rating: 4}] = Teuf.list_votes_for_soiree(host_scope, soiree)
 
+      # Confirmed invitee can read too (US11 visibility rule)
+      assert [%Vote{rating: 4}] = Teuf.list_votes_for_soiree(guest_scope, soiree)
+
+      # A user who is not invited cannot read
+      stranger_scope = user_scope_fixture()
+
       assert_raise MatchError, fn ->
-        Teuf.list_votes_for_soiree(guest_scope, soiree)
+        Teuf.list_votes_for_soiree(stranger_scope, soiree)
       end
+    end
+
+    test "can_view_votes?/2 reflects host or confirmed-invitee status" do
+      %{host_scope: host_scope, guest_scope: guest_scope, soiree: soiree} =
+        past_soiree_with_guest()
+
+      stranger_scope = user_scope_fixture()
+
+      assert Teuf.can_view_votes?(host_scope, soiree)
+      assert Teuf.can_view_votes?(guest_scope, soiree)
+      refute Teuf.can_view_votes?(stranger_scope, soiree)
+    end
+
+    test "cast_vote/3 stores an optional comment" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+
+      assert {:ok, %Vote{rating: 4, comment: "Super soirée"}} =
+               Teuf.cast_vote(scope, soiree, %{
+                 rating: 4,
+                 comment: "Super soirée",
+                 game_id: game.id
+               })
+    end
+
+    test "cast_vote/3 normalizes an empty / blank comment to nil" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+
+      assert {:ok, %Vote{comment: nil}} =
+               Teuf.cast_vote(scope, soiree, %{
+                 rating: 4,
+                 comment: "   ",
+                 game_id: game.id
+               })
+    end
+
+    test "cast_vote/3 rejects a comment longer than 500 chars" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+      too_long = String.duplicate("a", 501)
+
+      assert {:error, %Ecto.Changeset{errors: errors}} =
+               Teuf.cast_vote(scope, soiree, %{
+                 rating: 4,
+                 comment: too_long,
+                 game_id: game.id
+               })
+
+      assert Keyword.has_key?(errors, :comment)
+    end
+
+    test "cast_vote/3 updates the comment alongside the rating (upsert)" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+
+      {:ok, %Vote{} = first} =
+        Teuf.cast_vote(scope, soiree, %{rating: 3, comment: "first", game_id: game.id})
+
+      {:ok, %Vote{} = second} =
+        Teuf.cast_vote(scope, soiree, %{rating: 5, comment: "updated", game_id: game.id})
+
+      assert first.id == second.id
+      assert second.rating == 5
+      assert second.comment == "updated"
     end
 
     test "vote_summary_for_soiree/1 aggregates ratings" do

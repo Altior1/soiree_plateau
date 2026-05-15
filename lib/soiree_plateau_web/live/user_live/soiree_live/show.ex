@@ -84,28 +84,42 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
       <section :if={@can_vote} id="vote-block" class="mt-10">
         <h2 class="text-lg font-semibold mb-2">Noter le jeu</h2>
         <p class="text-sm text-base-content/70 mb-3">
-          Donne une note de 1 à 5 à <strong>{@soiree.game.name}</strong>. Tu peux la modifier à tout moment.
+          Donne une note de 1 à 5 à <strong>{@soiree.game.name}</strong>.
+          Tu peux la modifier à tout moment et ajouter un commentaire optionnel.
         </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <button
-            :for={n <- 1..5}
-            type="button"
-            phx-click="rate"
-            phx-value-rating={n}
-            class={[
-              "btn",
-              if(@current_rating == n, do: "btn-primary", else: "btn-primary btn-soft")
-            ]}
-          >
-            {n}
-          </button>
-          <span :if={@current_rating} class="ml-2 text-sm text-base-content/70">
-            Ta note actuelle : {@current_rating}/5
-          </span>
-        </div>
+        <form id="rate-form" phx-submit="rate" phx-change="comment_change" class="space-y-3">
+          <textarea
+            id="vote-comment"
+            name="comment"
+            rows="3"
+            maxlength={@comment_max_length}
+            placeholder="Ton commentaire (optionnel)"
+            class="textarea textarea-bordered w-full"
+          ><%= @current_comment %></textarea>
+          <p class="text-xs text-base-content/60">
+            {String.length(@current_comment || "")} / {@comment_max_length} caractères
+          </p>
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              :for={n <- 1..5}
+              type="submit"
+              name="rating"
+              value={n}
+              class={[
+                "btn",
+                if(@current_rating == n, do: "btn-primary", else: "btn-primary btn-soft")
+              ]}
+            >
+              {n}
+            </button>
+            <span :if={@current_rating} class="ml-2 text-sm text-base-content/70">
+              Ta note actuelle : {@current_rating}/5
+            </span>
+          </div>
+        </form>
       </section>
 
-      <section :if={@is_host and @soiree.game} class="mt-10">
+      <section :if={@can_see_votes and @soiree.game} class="mt-10">
         <h2 class="text-lg font-semibold mb-2">Notes reçues</h2>
         <%= if @votes == [] do %>
           <p class="text-sm text-base-content/70">
@@ -121,10 +135,15 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
             Moyenne : <strong>{format_average(@vote_average)}</strong>
             / 5 ({@votes |> length()} note{plural(@votes)})
           </p>
-          <ul id="votes" class="space-y-1 text-sm">
-            <li :for={v <- @votes} id={"vote-#{v.id}"} class="flex justify-between border-b py-1">
-              <span>{v.user.email}</span>
-              <span><strong>{v.rating}</strong>/5</span>
+          <ul id="votes" class="space-y-2 text-sm">
+            <li :for={v <- @votes} id={"vote-#{v.id}"} class="border-b py-2">
+              <div class="flex justify-between">
+                <span>{v.user.email}</span>
+                <span><strong>{v.rating}</strong>/5</span>
+              </div>
+              <p :if={v.comment} class="mt-1 italic text-base-content/80">
+                "{v.comment}"
+              </p>
             </li>
           </ul>
         <% end %>
@@ -143,27 +162,32 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
       |> Repo.preload([:game, :user])
 
     is_host = soiree.host == scope.user.id
-
-    can_vote =
-      not is_host and Teuf.confirmed_invitee?(scope, soiree) and Teuf.soiree_past?(soiree)
-
+    confirmed_invitee = Teuf.confirmed_invitee?(scope, soiree)
     soiree_past = Teuf.soiree_past?(soiree)
+
+    can_vote = not is_host and confirmed_invitee and soiree_past
+    can_see_votes = is_host or confirmed_invitee
 
     if connected?(socket) do
       Teuf.subscribe_soirees(scope)
 
       if is_host do
         Teuf.subscribe_soiree_invitations(soiree.id)
+      end
+
+      if can_see_votes do
         Teuf.subscribe_soiree_votes(soiree.id)
       end
     end
 
-    current_rating =
+    {current_rating, current_comment} =
       if can_vote and soiree.game_id do
         case Teuf.get_user_vote(scope, soiree, soiree.game_id) do
-          nil -> nil
-          vote -> vote.rating
+          nil -> {nil, nil}
+          vote -> {vote.rating, vote.comment}
         end
+      else
+        {nil, nil}
       end
 
     {:ok,
@@ -172,10 +196,13 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
      |> assign(:soiree, soiree)
      |> assign(:is_host, is_host)
      |> assign(:can_vote, can_vote)
+     |> assign(:can_see_votes, can_see_votes)
      |> assign(:soiree_past, soiree_past)
      |> assign(:current_rating, current_rating)
+     |> assign(:current_comment, current_comment)
+     |> assign(:comment_max_length, SoireePlateau.Teuf.Vote.comment_max_length())
      |> assign(:invitations, host_invitations(scope, soiree, is_host))
-     |> assign_votes(scope, soiree, is_host)}
+     |> assign_votes(scope, soiree, can_see_votes)}
   end
 
   @impl true
@@ -211,16 +238,24 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
     end
   end
 
-  def handle_event("rate", %{"rating" => rating}, socket) do
+  def handle_event("rate", params, socket) do
     scope = socket.assigns.current_scope
     soiree = socket.assigns.soiree
+    rating = params["rating"]
+    comment = Map.get(params, "comment", socket.assigns.current_comment)
 
-    case Teuf.cast_vote(scope, soiree, %{rating: rating, game_id: soiree.game_id}) do
+    case Teuf.cast_vote(scope, soiree, %{
+           rating: rating,
+           comment: comment,
+           game_id: soiree.game_id
+         }) do
       {:ok, vote} ->
         {:noreply,
          socket
          |> put_flash(:info, "Note enregistrée.")
-         |> assign(:current_rating, vote.rating)}
+         |> assign(:current_rating, vote.rating)
+         |> assign(:current_comment, vote.comment)
+         |> refresh_votes()}
 
       {:error, :not_invited} ->
         {:noreply, put_flash(socket, :error, "Tu n'es pas invité à cette soirée.")}
@@ -231,9 +266,19 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
       {:error, :invalid_game} ->
         {:noreply, put_flash(socket, :error, "Ce jeu n'est pas associé à la soirée.")}
 
-      {:error, %Ecto.Changeset{}} ->
-        {:noreply, put_flash(socket, :error, "Impossible d'enregistrer la note.")}
+      {:error, %Ecto.Changeset{} = changeset} ->
+        message =
+          case Keyword.get(changeset.errors, :comment) do
+            {msg, _} -> "Commentaire invalide : #{msg}"
+            _ -> "Impossible d'enregistrer la note."
+          end
+
+        {:noreply, put_flash(socket, :error, message)}
     end
+  end
+
+  def handle_event("comment_change", %{"comment" => comment}, socket) do
+    {:noreply, assign(socket, :current_comment, comment)}
   end
 
   @impl true
@@ -273,13 +318,7 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
   end
 
   def handle_info({:vote_cast, %SoireePlateau.Teuf.Vote{}}, socket) do
-    {:noreply,
-     assign_votes(
-       socket,
-       socket.assigns.current_scope,
-       socket.assigns.soiree,
-       socket.assigns.is_host
-     )}
+    {:noreply, refresh_votes(socket)}
   end
 
   defp host_invitations(scope, soiree, true),
@@ -306,6 +345,15 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
     socket
     |> assign(:votes, [])
     |> assign(:vote_average, nil)
+  end
+
+  defp refresh_votes(socket) do
+    assign_votes(
+      socket,
+      socket.assigns.current_scope,
+      socket.assigns.soiree,
+      socket.assigns.can_see_votes
+    )
   end
 
   defp format_average(nil), do: "—"
