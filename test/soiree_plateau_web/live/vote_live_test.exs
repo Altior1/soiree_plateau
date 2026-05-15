@@ -42,8 +42,8 @@ defmodule SoireePlateauWeb.VoteLiveTest do
       assert html =~ game.name
 
       assert live
-             |> element("#vote-block button", "4")
-             |> render_click() =~ "Note enregistrée"
+             |> form("#rate-form")
+             |> render_submit(%{"rating" => "4"}) =~ "Note enregistrée"
 
       scope = SoireePlateau.Accounts.Scope.for_user(user)
       assert %SoireePlateau.Teuf.Vote{rating: 4} = Teuf.get_user_vote(scope, soiree, game.id)
@@ -59,7 +59,7 @@ defmodule SoireePlateauWeb.VoteLiveTest do
       {:ok, live, _html} = live(conn, ~p"/users/soirees/#{soiree}")
       assert render(live) =~ "Ta note actuelle : 2/5"
 
-      live |> element("#vote-block button", "5") |> render_click()
+      live |> form("#rate-form") |> render_submit(%{"rating" => "5"})
       assert %SoireePlateau.Teuf.Vote{rating: 5} = Teuf.get_user_vote(scope, soiree, game.id)
     end
   end

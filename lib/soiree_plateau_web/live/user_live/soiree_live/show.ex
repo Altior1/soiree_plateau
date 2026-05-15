@@ -254,7 +254,8 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
          socket
          |> put_flash(:info, "Note enregistrée.")
          |> assign(:current_rating, vote.rating)
-         |> assign(:current_comment, vote.comment)}
+         |> assign(:current_comment, vote.comment)
+         |> refresh_votes()}
 
       {:error, :not_invited} ->
         {:noreply, put_flash(socket, :error, "Tu n'es pas invité à cette soirée.")}
