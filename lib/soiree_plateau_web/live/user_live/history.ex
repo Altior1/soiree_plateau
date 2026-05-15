@@ -37,7 +37,8 @@ defmodule SoireePlateauWeb.UserLive.History do
           <div class="rounded-lg border-2 border-dashed p-8 text-center text-base-content/70">
             <p class="text-sm">
               Tu n'as encore participé à aucune soirée passée.
-              Réponds <strong>"oui"</strong> à une invitation pour la voir apparaître ici après la soirée.
+              Réponds <strong>"oui"</strong>
+              à une invitation pour la voir apparaître ici après la soirée.
             </p>
           </div>
         <% else %>

@@ -766,6 +766,7 @@ defmodule SoireePlateau.TeufTest do
 
       # 3) future + yes + active → out
       future = NaiveDateTime.utc_now() |> NaiveDateTime.add(86_400, :second)
+
       {_h, future_soiree, _} =
         create_past_soiree_with(invitees: [user], title: "future", date: future)
 
