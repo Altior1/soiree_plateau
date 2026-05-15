@@ -318,4 +318,239 @@ defmodule SoireePlateau.TeufTest do
       end
     end
   end
+
+  defp past_soiree_with_guest(opts \\ []) do
+    import SoireePlateau.AccountsFixtures
+
+    host_scope = user_scope_fixture()
+    guest = user_fixture()
+    game = SoireePlateau.GamesFixtures.game_fixture()
+
+    attrs = %{
+      title: "passed",
+      date: opts[:date] || ~N[2020-01-01 18:00:00],
+      home: "h",
+      capacity: 5,
+      game_id: game.id,
+      invitee_ids: [guest.id]
+    }
+
+    {:ok, soiree} = Teuf.create_soiree(host_scope, attrs)
+    soiree = SoireePlateau.Repo.preload(soiree, :game)
+
+    guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
+    [invitation] = Teuf.list_invitations_for_user(guest_scope)
+    {:ok, _} = Teuf.respond_to_invitation(guest_scope, invitation, :yes)
+
+    %{host_scope: host_scope, guest: guest, guest_scope: guest_scope, soiree: soiree, game: game}
+  end
+
+  describe "votes" do
+    alias SoireePlateau.Teuf.Vote
+
+    import SoireePlateau.AccountsFixtures
+    import SoireePlateau.TeufFixtures
+
+    test "cast_vote/3 inserts a new vote" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+
+      assert {:ok, %Vote{rating: 4}} =
+               Teuf.cast_vote(scope, soiree, %{rating: 4, game_id: game.id})
+    end
+
+    test "cast_vote/3 updates an existing vote (upsert)" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+
+      {:ok, %Vote{} = first} = Teuf.cast_vote(scope, soiree, %{rating: 2, game_id: game.id})
+
+      {:ok, %Vote{} = updated} =
+        Teuf.cast_vote(scope, soiree, %{rating: 5, game_id: game.id})
+
+      assert first.id == updated.id
+      assert updated.rating == 5
+    end
+
+    test "cast_vote/3 rejects a rating outside 1..5" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Teuf.cast_vote(scope, soiree, %{rating: 6, game_id: game.id})
+
+      assert {:error, %Ecto.Changeset{}} =
+               Teuf.cast_vote(scope, soiree, %{rating: 0, game_id: game.id})
+    end
+
+    test "cast_vote/3 refuses if user is not a confirmed invitee" do
+      host_scope = user_scope_fixture()
+      stranger_scope = user_scope_fixture()
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        Teuf.create_soiree(host_scope, %{
+          title: "t",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id
+        })
+
+      assert {:error, :not_invited} =
+               Teuf.cast_vote(stranger_scope, soiree, %{rating: 3, game_id: game.id})
+    end
+
+    test "cast_vote/3 refuses for an invitee who declined" do
+      host_scope = user_scope_fixture()
+      guest = user_fixture()
+      guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        Teuf.create_soiree(host_scope, %{
+          title: "t",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id,
+          invitee_ids: [guest.id]
+        })
+
+      [invitation] = Teuf.list_invitations_for_user(guest_scope)
+      {:ok, _} = Teuf.respond_to_invitation(guest_scope, invitation, :no)
+
+      assert {:error, :not_invited} =
+               Teuf.cast_vote(guest_scope, soiree, %{rating: 3, game_id: game.id})
+    end
+
+    test "cast_vote/3 refuses before the soiree happens" do
+      host_scope = user_scope_fixture()
+      guest = user_fixture()
+      guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      future = NaiveDateTime.utc_now() |> NaiveDateTime.add(7 * 24 * 3600, :second)
+
+      {:ok, soiree} =
+        Teuf.create_soiree(host_scope, %{
+          title: "future",
+          date: future,
+          home: "h",
+          capacity: 5,
+          game_id: game.id,
+          invitee_ids: [guest.id]
+        })
+
+      [invitation] = Teuf.list_invitations_for_user(guest_scope)
+      {:ok, _} = Teuf.respond_to_invitation(guest_scope, invitation, :yes)
+
+      assert {:error, :soiree_not_finished} =
+               Teuf.cast_vote(guest_scope, soiree, %{rating: 3, game_id: game.id})
+    end
+
+    test "cast_vote/3 refuses a game not linked to the soiree" do
+      %{guest_scope: scope, soiree: soiree} = past_soiree_with_guest()
+      other_game = SoireePlateau.GamesFixtures.game_fixture()
+
+      assert {:error, :invalid_game} =
+               Teuf.cast_vote(scope, soiree, %{rating: 3, game_id: other_game.id})
+    end
+
+    test "cast_vote/3 broadcasts the new vote" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+
+      Teuf.subscribe_soiree_votes(soiree.id)
+
+      assert {:ok, _vote} =
+               Teuf.cast_vote(scope, soiree, %{rating: 3, game_id: game.id})
+
+      assert_receive {:vote_cast, %Vote{rating: 3}}
+    end
+
+    test "get_user_vote/3 returns the user's existing vote" do
+      %{guest_scope: scope, soiree: soiree, game: game} = past_soiree_with_guest()
+      assert is_nil(Teuf.get_user_vote(scope, soiree, game.id))
+
+      {:ok, _} = Teuf.cast_vote(scope, soiree, %{rating: 3, game_id: game.id})
+      assert %Vote{rating: 3} = Teuf.get_user_vote(scope, soiree, game.id)
+    end
+
+    test "list_votes_for_soiree/2 only callable by host" do
+      %{host_scope: host_scope, guest_scope: guest_scope, soiree: soiree, game: game} =
+        past_soiree_with_guest()
+
+      {:ok, _} = Teuf.cast_vote(guest_scope, soiree, %{rating: 4, game_id: game.id})
+
+      assert [%Vote{rating: 4}] = Teuf.list_votes_for_soiree(host_scope, soiree)
+
+      assert_raise MatchError, fn ->
+        Teuf.list_votes_for_soiree(guest_scope, soiree)
+      end
+    end
+
+    test "vote_summary_for_soiree/1 aggregates ratings" do
+      host_scope = user_scope_fixture()
+      g1 = user_fixture()
+      g2 = user_fixture()
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        Teuf.create_soiree(host_scope, %{
+          title: "p",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id,
+          invitee_ids: [g1.id, g2.id]
+        })
+
+      Enum.each([g1, g2], fn user ->
+        scope = SoireePlateau.Accounts.Scope.for_user(user)
+        [inv] = Teuf.list_invitations_for_user(scope)
+        {:ok, _} = Teuf.respond_to_invitation(scope, inv, :yes)
+      end)
+
+      g1_scope = SoireePlateau.Accounts.Scope.for_user(g1)
+      g2_scope = SoireePlateau.Accounts.Scope.for_user(g2)
+      {:ok, _} = Teuf.cast_vote(g1_scope, soiree, %{rating: 4, game_id: game.id})
+      {:ok, _} = Teuf.cast_vote(g2_scope, soiree, %{rating: 2, game_id: game.id})
+
+      assert [%{game_id: gid, count: 2, average: avg}] =
+               Teuf.vote_summary_for_soiree(soiree)
+
+      assert gid == game.id
+      assert Decimal.equal?(Decimal.round(avg, 1), Decimal.new("3.0"))
+    end
+
+    test "get_visible_soiree!/2 lets the host access their soiree" do
+      scope = user_scope_fixture()
+      soiree = soiree_fixture(scope)
+      assert Teuf.get_visible_soiree!(scope, soiree.id).id == soiree.id
+    end
+
+    test "get_visible_soiree!/2 lets an invitee access the soiree" do
+      host_scope = user_scope_fixture()
+      guest = user_fixture()
+      guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
+
+      {:ok, soiree} =
+        Teuf.create_soiree(host_scope, %{
+          title: "t",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          invitee_ids: [guest.id]
+        })
+
+      assert Teuf.get_visible_soiree!(guest_scope, soiree.id).id == soiree.id
+    end
+
+    test "get_visible_soiree!/2 raises for a stranger" do
+      host_scope = user_scope_fixture()
+      stranger_scope = user_scope_fixture()
+      soiree = soiree_fixture(host_scope)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Teuf.get_visible_soiree!(stranger_scope, soiree.id)
+      end
+    end
+  end
 end

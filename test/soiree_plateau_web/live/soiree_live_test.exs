@@ -108,6 +108,23 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
       assert html =~ soiree.title
     end
 
+    test "host sees the vote summary block", %{conn: conn, scope: scope} do
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        SoireePlateau.Teuf.create_soiree(scope, %{
+          title: "past",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id
+        })
+
+      {:ok, _show_live, html} = live(conn, ~p"/users/soirees/#{soiree}")
+      assert html =~ "Notes reçues"
+      assert html =~ "Aucune note pour l&#39;instant"
+    end
+
     test "updates soiree and returns to show", %{conn: conn, soiree: soiree} do
       {:ok, show_live, _html} = live(conn, ~p"/users/soirees/#{soiree}")
 
@@ -132,6 +149,52 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
       html = render(show_live)
       assert html =~ "Soirée mise à jour avec succès"
       assert html =~ "some updated title"
+    end
+  end
+
+  describe "Form" do
+    test "create with selected invitees inserts pending invitations", %{conn: conn, scope: scope} do
+      guest = SoireePlateau.AccountsFixtures.user_fixture()
+      {:ok, form_live, _html} = live(conn, ~p"/users/soirees/new")
+
+      attrs_with_invitees = Map.put(@create_attrs, :invitee_ids, [to_string(guest.id)])
+
+      {:ok, _index_live, _html} =
+        form_live
+        |> form("#soiree-form", soiree: attrs_with_invitees)
+        |> render_submit()
+        |> follow_redirect(conn, ~p"/users/soirees")
+
+      [soiree] = SoireePlateau.Teuf.list_soirees(scope)
+      assert SoireePlateau.Teuf.list_invitee_ids(soiree) == [guest.id]
+    end
+  end
+
+  describe "Form edit" do
+    setup [:create_soiree]
+
+    test "returns to show when return_to=show", %{conn: conn, soiree: soiree} do
+      {:ok, form_live, _html} =
+        live(conn, ~p"/users/soirees/#{soiree}/edit?return_to=show")
+
+      assert {:ok, _show_live, html} =
+               form_live
+               |> form("#soiree-form", soiree: @update_attrs)
+               |> render_submit()
+               |> follow_redirect(conn, ~p"/users/soirees/#{soiree}")
+
+      assert html =~ "Soirée mise à jour"
+    end
+
+    test "shows changeset errors on invalid submit", %{conn: conn, soiree: soiree} do
+      {:ok, form_live, _html} = live(conn, ~p"/users/soirees/#{soiree}/edit")
+
+      html =
+        form_live
+        |> form("#soiree-form", soiree: @invalid_attrs)
+        |> render_submit()
+
+      assert html =~ "can&#39;t be blank"
     end
   end
 end

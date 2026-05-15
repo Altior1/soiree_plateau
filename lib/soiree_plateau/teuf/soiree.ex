@@ -12,6 +12,7 @@ defmodule SoireePlateau.Teuf.Soiree do
 
     has_many :invitations, SoireePlateau.Teuf.Invitation, on_delete: :delete_all
     has_many :invitees, through: [:invitations, :user]
+    has_many :votes, SoireePlateau.Teuf.Vote, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

@@ -14,6 +14,7 @@ defmodule SoireePlateau.Games.Game do
     field :complexity, :integer
 
     has_many :soirees, SoireePlateau.Teuf.Soiree
+    has_many :votes, SoireePlateau.Teuf.Vote
 
     timestamps(type: :utc_datetime)
   end

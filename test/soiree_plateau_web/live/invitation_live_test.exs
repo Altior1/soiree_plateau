@@ -63,12 +63,28 @@ defmodule SoireePlateauWeb.InvitationLiveTest do
       assert html =~ "Aucune invitation"
     end
 
-    test "live-updates when a new invitation is created from another scope" do
-      user = user_fixture()
-      conn = log_in_user(Phoenix.ConnTest.build_conn(), user)
+    test "an invalid status from the UI shows an error flash", %{
+      conn: conn,
+      scope: scope
+    } do
+      {:ok, live, _html} = live(conn, ~p"/users/invitations")
+      [invitation] = Teuf.list_invitations_for_user(scope)
 
-      {:ok, live, html} = live(conn, ~p"/users/invitations")
-      assert html =~ "Aucune invitation"
+      result =
+        render_hook(live, "respond", %{
+          "id" => to_string(invitation.id),
+          "status" => "garbage"
+        })
+
+      assert result =~ "Statut invalide"
+    end
+
+    test "live update via PubSub when another user invites the current user", %{
+      conn: conn,
+      user: user
+    } do
+      {:ok, live, _html} = live(conn, ~p"/users/invitations")
+      initial = render(live)
 
       other_host = user_fixture()
       other_host_scope = SoireePlateau.Accounts.Scope.for_user(other_host)
@@ -76,13 +92,21 @@ defmodule SoireePlateauWeb.InvitationLiveTest do
       {:ok, _soiree} =
         Teuf.create_soiree(other_host_scope, %{
           title: "Surprise party",
-          date: ~N[2026-07-01 20:00:00],
-          home: "ailleurs",
+          date: ~N[2026-12-31 22:00:00],
+          home: "secret",
           capacity: 5,
           invitee_ids: [user.id]
         })
 
-      assert render(live) =~ "Surprise party"
+      updated = render(live)
+      refute initial =~ "Surprise party"
+      assert updated =~ "Surprise party"
+    end
+
+    test "shows the link to view the soiree", %{conn: conn, soiree: soiree} do
+      {:ok, _live, html} = live(conn, ~p"/users/invitations")
+      assert html =~ "Voir la soirée"
+      assert html =~ "/users/soirees/#{soiree.id}"
     end
   end
 end

@@ -222,15 +222,62 @@ set_status.(soiree_2, emma, :maybe)
 
 IO.puts("✓ 3 soirées créées avec invitations + RSVP variés")
 
+# -- Soirées passées avec votes ----------------------------------------------
+# On crée des soirées dans le passé pour pouvoir tester le vote (note 1-5).
+
+past_1 =
+  create_soiree.(alice_scope, %{
+    title: "Soirée Catan (passée)",
+    date: ~N[2026-04-10 20:00:00],
+    home: "Chez Alice",
+    capacity: 4,
+    game_id: catan.id,
+    invitee_ids: [bob.id, chloe.id, david.id]
+  })
+
+past_2 =
+  create_soiree.(bob_scope, %{
+    title: "Carcassonne soirée d'hiver",
+    date: ~N[2026-02-14 19:00:00],
+    home: "Chez Bob",
+    capacity: 5,
+    game_id: carcassonne.id,
+    invitee_ids: [alice.id, chloe.id, emma.id]
+  })
+
+# Tous les invités acceptent les soirées passées
+for soiree <- [past_1, past_2], invitee_id <- Teuf.list_invitee_ids(soiree) do
+  case Repo.get_by(Invitation, soiree_id: soiree.id, user_id: invitee_id) do
+    nil -> nil
+    inv -> inv |> Ecto.Changeset.change(status: :yes) |> Repo.update!()
+  end
+end
+
+# Quelques votes pour rendre les vues hôte intéressantes
+cast_vote = fn user, soiree, game, rating ->
+  scope = Accounts.Scope.for_user(user)
+  Teuf.cast_vote(scope, soiree, %{rating: rating, game_id: game.id})
+end
+
+cast_vote.(bob, past_1, catan, 5)
+cast_vote.(chloe, past_1, catan, 4)
+cast_vote.(david, past_1, catan, 3)
+
+cast_vote.(alice, past_2, carcassonne, 4)
+cast_vote.(chloe, past_2, carcassonne, 5)
+# emma n'a pas encore voté — elle verra le bloc de vote à l'écran
+
+IO.puts("✓ 2 soirées passées avec votes (Catan + Carcassonne)")
+
 IO.puts("""
 
 Comptes de test (mot de passe : #{password}) :
   - admin@example.com  (administrateur)
-  - alice@example.com  (hôte de 2 soirées, invitée à 1)
-  - bob@example.com    (hôte de 1 soirée, invité à 2)
-  - chloe@example.com  (invitée à 3 soirées)
-  - david@example.com  (invité à 2 soirées)
-  - emma@example.com   (invitée à 1 soirée)
+  - alice@example.com  (hôte, invitée à des soirées passées)
+  - bob@example.com    (hôte, a voté sur des soirées passées)
+  - chloe@example.com  (invitée à des soirées futures + passées)
+  - david@example.com  (a voté sur une soirée passée)
+  - emma@example.com   (invitée à une soirée passée — vote en attente)
 
 Connexion par magic link : http://localhost:4000/users/log-in
   → en environnement dev, voir le lien dans http://localhost:4000/dev/mailbox
