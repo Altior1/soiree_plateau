@@ -317,13 +317,7 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
   end
 
   def handle_info({:vote_cast, %SoireePlateau.Teuf.Vote{}}, socket) do
-    {:noreply,
-     assign_votes(
-       socket,
-       socket.assigns.current_scope,
-       socket.assigns.soiree,
-       socket.assigns.is_host
-     )}
+    {:noreply, refresh_votes(socket)}
   end
 
   defp host_invitations(scope, soiree, true),
@@ -350,6 +344,15 @@ defmodule SoireePlateauWeb.SoireeLive.Show do
     socket
     |> assign(:votes, [])
     |> assign(:vote_average, nil)
+  end
+
+  defp refresh_votes(socket) do
+    assign_votes(
+      socket,
+      socket.assigns.current_scope,
+      socket.assigns.soiree,
+      socket.assigns.can_see_votes
+    )
   end
 
   defp format_average(nil), do: "—"
