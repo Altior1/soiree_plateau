@@ -163,6 +163,52 @@ defmodule SoireePlateauWeb.SoireeLiveTest do
       assert html =~ "4</strong>/5"
     end
 
+    test "host can cancel their own soiree from the show page", %{conn: conn, scope: scope} do
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        SoireePlateau.Teuf.create_soiree(scope, %{
+          title: "to cancel",
+          date: NaiveDateTime.utc_now() |> NaiveDateTime.add(86_400, :second),
+          home: "h",
+          capacity: 5,
+          game_id: game.id
+        })
+
+      {:ok, show_live, html} = live(conn, ~p"/users/soirees/#{soiree}")
+      assert html =~ "Annuler la soirée"
+
+      html =
+        show_live
+        |> element("button", "Annuler la soirée")
+        |> render_click()
+
+      assert html =~ "Soirée annulée"
+
+      reloaded = SoireePlateau.Repo.reload!(soiree)
+      assert reloaded.status == :cancelled
+    end
+
+    test "an invited member does not see the cancel button", %{conn: _conn, scope: scope} do
+      game = SoireePlateau.GamesFixtures.game_fixture()
+      guest = SoireePlateau.AccountsFixtures.user_fixture()
+
+      {:ok, soiree} =
+        SoireePlateau.Teuf.create_soiree(scope, %{
+          title: "future",
+          date: NaiveDateTime.utc_now() |> NaiveDateTime.add(86_400, :second),
+          home: "h",
+          capacity: 5,
+          game_id: game.id,
+          invitee_ids: [guest.id]
+        })
+
+      guest_conn = Phoenix.ConnTest.build_conn() |> log_in_user(guest)
+      {:ok, _show_live, html} = live(guest_conn, ~p"/users/soirees/#{soiree}")
+
+      refute html =~ "Annuler la soirée"
+    end
+
     test "stranger (not invited) does not see the notes block", %{conn: _conn, scope: scope} do
       game = SoireePlateau.GamesFixtures.game_fixture()
 

@@ -621,4 +621,98 @@ defmodule SoireePlateau.TeufTest do
       end
     end
   end
+
+  describe "cancel_soiree" do
+    alias SoireePlateau.Teuf.Soiree
+
+    import SoireePlateau.AccountsFixtures
+    import SoireePlateau.TeufFixtures
+
+    test "host can cancel their own soiree" do
+      scope = user_scope_fixture()
+      soiree = soiree_fixture(scope)
+
+      assert {:ok, %Soiree{status: :cancelled}} = Teuf.cancel_soiree(scope, soiree)
+    end
+
+    test "admin can cancel another user's soiree" do
+      host_scope = user_scope_fixture()
+      admin = admin_user_fixture()
+      admin_scope = SoireePlateau.Accounts.Scope.for_user(admin)
+      soiree = soiree_fixture(host_scope)
+
+      assert {:ok, %Soiree{status: :cancelled}} = Teuf.cancel_soiree(admin_scope, soiree)
+    end
+
+    test "a non-host non-admin cannot cancel a soiree" do
+      host_scope = user_scope_fixture()
+      stranger_scope = user_scope_fixture()
+      soiree = soiree_fixture(host_scope)
+
+      assert {:error, :unauthorized} = Teuf.cancel_soiree(stranger_scope, soiree)
+    end
+
+    test "cancelling an already cancelled soiree returns :already_cancelled" do
+      scope = user_scope_fixture()
+      soiree = soiree_fixture(scope)
+
+      {:ok, cancelled} = Teuf.cancel_soiree(scope, soiree)
+      assert {:error, :already_cancelled} = Teuf.cancel_soiree(scope, cancelled)
+    end
+
+    test "respond_to_invitation refuses on a cancelled soiree" do
+      host_scope = user_scope_fixture()
+      guest = user_fixture()
+      guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
+
+      {:ok, soiree} =
+        Teuf.create_soiree(host_scope, %{
+          title: "to be cancelled",
+          date: NaiveDateTime.utc_now() |> NaiveDateTime.add(86_400, :second),
+          home: "h",
+          capacity: 5,
+          game_id: SoireePlateau.GamesFixtures.game_fixture().id,
+          invitee_ids: [guest.id]
+        })
+
+      [invitation] = Teuf.list_invitations_for_user(guest_scope)
+      {:ok, _cancelled} = Teuf.cancel_soiree(host_scope, soiree)
+
+      assert {:error, :soiree_cancelled} =
+               Teuf.respond_to_invitation(guest_scope, invitation, :yes)
+    end
+
+    test "cast_vote refuses on a cancelled soiree" do
+      host_scope = user_scope_fixture()
+      guest = user_fixture()
+      guest_scope = SoireePlateau.Accounts.Scope.for_user(guest)
+      game = SoireePlateau.GamesFixtures.game_fixture()
+
+      {:ok, soiree} =
+        Teuf.create_soiree(host_scope, %{
+          title: "passed and cancelled",
+          date: ~N[2020-01-01 18:00:00],
+          home: "h",
+          capacity: 5,
+          game_id: game.id,
+          invitee_ids: [guest.id]
+        })
+
+      [invitation] = Teuf.list_invitations_for_user(guest_scope)
+      {:ok, _} = Teuf.respond_to_invitation(guest_scope, invitation, :yes)
+      {:ok, cancelled} = Teuf.cancel_soiree(host_scope, soiree)
+
+      assert {:error, :soiree_cancelled} =
+               Teuf.cast_vote(guest_scope, cancelled, %{rating: 4, game_id: game.id})
+    end
+
+    test "cancelled? reflects the soiree state" do
+      scope = user_scope_fixture()
+      soiree = soiree_fixture(scope)
+
+      refute Teuf.cancelled?(soiree)
+      {:ok, cancelled} = Teuf.cancel_soiree(scope, soiree)
+      assert Teuf.cancelled?(cancelled)
+    end
+  end
 end
